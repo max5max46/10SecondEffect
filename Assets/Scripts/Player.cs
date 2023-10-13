@@ -5,10 +5,11 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-
+    [SerializeField] private GameObject camera;
     [SerializeField] private float acceleration = 2;
     [SerializeField] private float maxSpeed = 1;
     [SerializeField] private float deceleration = 1;
+    [SerializeField] private float cameraHeight = 5;
 
     private Rigidbody rb;
 
@@ -20,12 +21,15 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        camera.transform.position = new Vector3(transform.position.x, cameraHeight, transform.position.z);
         rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        //Update camera to follow player
+        camera.transform.position = new Vector3(transform.position.x, cameraHeight, transform.position.z);
 
         //grabs player input and stores it
         if (Input.GetKey(KeyCode.W))
@@ -43,6 +47,8 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        
+
         //Force Adding Variables to zero for the next add force
         float moveForwardBackward = 0;
         float moveLeftRight = 0;

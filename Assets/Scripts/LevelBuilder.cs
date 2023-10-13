@@ -6,7 +6,7 @@ using UnityEngine;
 public class LevelBuilder : MonoBehaviour
 {
 
-
+    public GameObject player;
     [SerializeField] private GameObject floorTile;
     [SerializeField] private GameObject wallTileNoSides;
     [SerializeField] private GameObject wallTileOneSide;
@@ -46,7 +46,7 @@ public class LevelBuilder : MonoBehaviour
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                 {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1},
                 {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1},
-                {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
                 {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         };
@@ -65,6 +65,8 @@ public class LevelBuilder : MonoBehaviour
 
         float xEvenOffset = 0;
         float yEvenOffset = 0;
+
+        player.transform.position = new Vector3(player.transform.position.x, player.transform.position.y + (scale / 2) + (transform.localScale.y/2), player.transform.position.z);
 
         if (loadedMap.GetLength(1) % 2 == 0) xEvenOffset = scale / 2;
         if (loadedMap.GetLength(0) % 2 == 0) yEvenOffset = scale / 2;
