@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class LevelBuilder : MonoBehaviour
@@ -10,28 +11,26 @@ public class LevelBuilder : MonoBehaviour
     [SerializeField] private GameObject wallTile;
     [SerializeField] private float scale = 1;
 
-    private enum TileType
+
+    private struct Tile
     {
-        Floor,
-        WallN,
-        WallS,
-        WallE,
-        WallW,
-        WallCornerNE,
-        WallCornerNW,
-        WallCornerSE,
-        WallCornerSW,
-        WallDeadEndN,
-        WallDeadEndS,
-        WallDeadEndE,
-        WallDeadEndW,
-        WallPillar
+        public string name;
+        public GameObject asset;
+        public float yRotation;
+        public int height;
+        public Tile(string name, GameObject gameObject, float yRotation = 0, int height = 0)
+        {
+            this.name = name;
+            this.asset = gameObject;
+            this.yRotation = yRotation;
+            this.height = height;
+        }
     }
 
     private GameObject[,] floorTiles;
     private GameObject[,] wallTiles;
     private int[,] loadedMap;
-    private TileType[,] map;
+    private Tile[,] tileMap;
 
 
     // Start is called before the first frame update
@@ -54,7 +53,7 @@ public class LevelBuilder : MonoBehaviour
         floorTile.transform.localScale = new Vector3(scale, scale, scale);
         wallTile.transform.localScale = new Vector3(scale, scale, scale);
 
-
+        IntMapToTileMap();
 
         float xEvenOffset = 0;
         float yEvenOffset = 0;
@@ -62,27 +61,10 @@ public class LevelBuilder : MonoBehaviour
         if (loadedMap.GetLength(1) % 2 == 0) xEvenOffset = scale / 2;
         if (loadedMap.GetLength(0) % 2 == 0) yEvenOffset = scale / 2;
 
-
-        floorTiles = new GameObject[loadedMap.GetLength(0), loadedMap.GetLength(1)];
-        wallTiles = new GameObject[loadedMap.GetLength(0), loadedMap.GetLength(1)];
-
-        for (int i = 0; i < loadedMap.GetLength(0); i++)
-            for (int j = 0; j < loadedMap.GetLength(1); j++)
-                floorTiles[i, j] = floorTile;
-
-        for (int i = 0; i < loadedMap.GetLength(0); i++)
-            for (int j = 0; j < loadedMap.GetLength(1); j++)
-                if (loadedMap[i, j] == 1)
-                    wallTiles[i, j] = wallTile;
-
-        for (int i = 0; i < floorTiles.GetLength(0); i++)
-            for (int j = 0; j < floorTiles.GetLength(1); j++)
-                Instantiate(floorTiles[i, j], new Vector3(((-(floorTiles.GetLength(1) / 2) + j) * scale) + xEvenOffset, 0, (((floorTiles.GetLength(0) / 2) - i) * scale) - yEvenOffset), Quaternion.identity);
-
-        for (int i = 0; i < wallTiles.GetLength(0); i++)
-            for (int j = 0; j < wallTiles.GetLength(1); j++)
-                if (wallTiles[i, j] == wallTile)
-                    Instantiate(wallTiles[i, j], new Vector3(((-(wallTiles.GetLength(1) / 2) + j) * scale) + xEvenOffset, scale, (((wallTiles.GetLength(0) / 2) - i) * scale) - yEvenOffset), Quaternion.identity);
+        // adds all game objects to scene using tileMap
+        for (int i = 0; i < tileMap.GetLength(0); i++)
+            for (int j = 0; j < tileMap.GetLength(1); j++)
+                Instantiate(tileMap[i, j].asset, new Vector3(((-(tileMap.GetLength(1) / 2) + j) * scale) + xEvenOffset, tileMap[i, j].height * scale, (((tileMap.GetLength(0) / 2) - i) * scale) - yEvenOffset), Quaternion.Euler(new Vector3(0, tileMap[i, j].yRotation, 0)));
 
     }
 
@@ -92,20 +74,144 @@ public class LevelBuilder : MonoBehaviour
         
     }
 
-    private void MapIntToEnum()
+    private void IntMapToTileMap()
     {
-        map = new TileType[loadedMap.GetLength(0), loadedMap.GetLength(1)];
+        tileMap = new Tile[loadedMap.GetLength(0), loadedMap.GetLength(1)];
 
+        //looks through all tiles and there surroundings to find what kind of tile they should be (ex: a one sided wall facing North)
         for (int i = 0; i < loadedMap.GetLength(0); i++)
             for (int j = 0; j < loadedMap.GetLength(1); j++)
-                if (loadedMap[i, j] == 1)
-                {
-                    if (loadedMap[i - 1, j] == 0)
-                        map[i, j] = TileType.WallN;
-                    if (loadedMap[i + 1, j] == 0)
-                        map[i, j] = TileType.WallS;
-                }
+            {
+                string tileInfoString = "";
+                /*this checks all map tiles around the one we're looking and simplifies it into a string of 5 digits
+                 "01101" looks like:
+
+                    0     100
+                   110 or 110 (*corners are not inculed in the string)
+                    1     111
+                
+                 on the map */
+                for (int k = -1; k < 2; k++)
+                    for (int l = -1; l < 2; l++)
+                    {
+                        //stops corners from being put in the string (removes the origin tile [i,j])
+                        if (k != l && k + l != 0)
+                        {
+                            //checks if the tile looked at is outside the map data, if it is default to a wall
+                            if (i + k < 0 || j + l < 0 || i + k > loadedMap.GetLength(0) - 1 || j + l > loadedMap.GetLength(1) - 1)
+                                tileInfoString += 1;
+                            else
+                                tileInfoString += loadedMap[i+k, j+l];
+                        }
+                        //puts the origin tile [i,j] back in the string
+                        if (k == 0 && l == 0)
+                            tileInfoString += loadedMap[i, j];
+                    }
+
+                //Debug.Log(tileInfoString);
+
+                if (tileInfoString[2] == '0')
+                    tileMap[i, j] = new Tile("Floor", floorTile, 0, 0);
                 else
-                    map[i, j] = TileType.Floor;
+                    switch (tileInfoString)
+                    {
+                        case  "1" +
+                             "111" +
+                              "1":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "0" +
+                             "111" +
+                              "1":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "1" +
+                             "110" +
+                              "1":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "1" +
+                             "111" +
+                              "0":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "1" +
+                             "011" +
+                              "1":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "0" +
+                             "110" +
+                              "1":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "1" +
+                             "110" +
+                              "0":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "1" +
+                             "011" +
+                              "0":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "0" +
+                             "011" +
+                              "1":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "0" +
+                             "111" +
+                              "0":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "1" +
+                             "010" +
+                              "1":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "0" +
+                             "010" +
+                              "1":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "0" +
+                             "110" +
+                              "0":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "1" +
+                             "010" +
+                              "0":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "0" +
+                             "011" +
+                              "0":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                        case  "0" +
+                             "010" +
+                              "0":
+                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            break;
+
+                    }
+            }
     }
 }
