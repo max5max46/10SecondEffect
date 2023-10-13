@@ -8,7 +8,12 @@ public class LevelBuilder : MonoBehaviour
 
 
     [SerializeField] private GameObject floorTile;
-    [SerializeField] private GameObject wallTile;
+    [SerializeField] private GameObject wallTileNoSides;
+    [SerializeField] private GameObject wallTileOneSide;
+    [SerializeField] private GameObject wallTileTwoSidesCorner;
+    [SerializeField] private GameObject wallTileTwoSidesStraight;
+    [SerializeField] private GameObject wallTileThreeSides;
+    [SerializeField] private GameObject wallTileFourSides;
     [SerializeField] private float scale = 1;
 
 
@@ -39,19 +44,22 @@ public class LevelBuilder : MonoBehaviour
         loadedMap = new int[,]            
         {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1},
+                {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         };
 
 
 
-
-
         floorTile.transform.localScale = new Vector3(scale, scale, scale);
-        wallTile.transform.localScale = new Vector3(scale, scale, scale);
+        wallTileNoSides.transform.localScale = new Vector3(scale, scale, scale);
+        wallTileOneSide.transform.localScale = new Vector3(scale, scale, scale);
+        wallTileTwoSidesCorner.transform.localScale = new Vector3(scale, scale, scale);
+        wallTileTwoSidesStraight.transform.localScale = new Vector3(scale, scale, scale);
+        wallTileThreeSides.transform.localScale = new Vector3(scale, scale, scale);
+        wallTileFourSides.transform.localScale = new Vector3(scale, scale, scale);
 
         IntMapToTileMap();
 
@@ -118,97 +126,97 @@ public class LevelBuilder : MonoBehaviour
                         case  "1" +
                              "111" +
                               "1":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileNoSides", wallTileNoSides, 0, 1);
                             break;
 
                         case  "0" +
                              "111" +
                               "1":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileOneSideNorth", wallTileOneSide, 0, 1);
                             break;
 
                         case  "1" +
                              "110" +
                               "1":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileOneSideEast", wallTileOneSide, 90, 1);
                             break;
 
                         case  "1" +
                              "111" +
                               "0":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileOneSideSouth", wallTileOneSide, 180, 1);
                             break;
 
                         case  "1" +
                              "011" +
                               "1":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileOneSideWest", wallTileOneSide, 270, 1);
                             break;
 
                         case  "0" +
                              "110" +
                               "1":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileTwoSidesCornerNorth", wallTileTwoSidesCorner, 0, 1);
                             break;
 
                         case  "1" +
                              "110" +
                               "0":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileTwoSidesCornerEast", wallTileTwoSidesCorner, 90, 1);
                             break;
 
                         case  "1" +
                              "011" +
                               "0":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileTwoSidesCornerSouth", wallTileTwoSidesCorner, 180, 1);
                             break;
 
                         case  "0" +
                              "011" +
                               "1":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileTwoSidesCornerWest", wallTileTwoSidesCorner, 270, 1);
                             break;
 
                         case  "0" +
                              "111" +
                               "0":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileTwoSidesStraightHorizontal", wallTileTwoSidesStraight, 0, 1);
                             break;
 
                         case  "1" +
                              "010" +
                               "1":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileTwoSidesStraightVertical", wallTileTwoSidesStraight, 90, 1);
                             break;
 
                         case  "0" +
                              "010" +
                               "1":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileThreeSidesNorth", wallTileThreeSides, 0, 1);
                             break;
 
                         case  "0" +
                              "110" +
                               "0":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileThreeSidesEast", wallTileThreeSides, 90, 1);
                             break;
 
                         case  "1" +
                              "010" +
                               "0":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileThreeSidesSouth", wallTileThreeSides, 180, 1);
                             break;
 
                         case  "0" +
                              "011" +
                               "0":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileThreeSidesWest", wallTileThreeSides, 270, 1);
                             break;
 
                         case  "0" +
                              "010" +
                               "0":
-                            tileMap[i, j] = new Tile("Wall", wallTile, 0, 1);
+                            tileMap[i, j] = new Tile("WallTileFourSides", wallTileFourSides, 0, 1);
                             break;
 
                     }

@@ -169,8 +169,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorTile: {fileID: 7779784770988981320, guid: ac8e530d41421124f95cca6e295226c6, type: 3}
-  wallTile: {fileID: 3914814082940518179, guid: 782dbd6c987ef78418e19efb0dfee9f1, type: 3}
-  scale: 2
+  wallTileNoSides: {fileID: 5605779585339798211, guid: ea72769eb6ee2024ab7fc869d0d83ab9, type: 3}
+  wallTileOneSide: {fileID: 688337809699300638, guid: 3a95136c4aa036f4a905712144369871, type: 3}
+  wallTileTwoSidesCorner: {fileID: 6260777747282787949, guid: 3587b28d0760b824cb4cfbe87ebe4f2b, type: 3}
+  wallTileTwoSidesStraight: {fileID: 5164983229543737289, guid: 68f013a8dbd43734e9ce0a846f166d43, type: 3}
+  wallTileThreeSides: {fileID: 7639562028052012938, guid: b0585e0cced80674ba46cd37e0a49795, type: 3}
+  wallTileFourSides: {fileID: 2956656406424848103, guid: 13473efd46d4f574cb9ee6e1f1080820, type: 3}
+  scale: 1
 --- !u!1 &704315416
 GameObject:
   m_ObjectHideFlags: 0
