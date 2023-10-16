@@ -45,9 +45,12 @@ public class LevelBuilder : MonoBehaviour
         {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                 {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1},
+                {1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1},
                 {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                {1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1},
+                {1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1},
+                {1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         };
 
@@ -107,7 +110,7 @@ public class LevelBuilder : MonoBehaviour
                         //stops corners from being put in the string (removes the origin tile [i,j])
                         if (k != l && k + l != 0)
                         {
-                            //checks if the tile looked at is outside the map data, if it is default to a wall
+                            //checks if the tile looked at is outside the map data, if it is, default to a wall
                             if (i + k < 0 || j + l < 0 || i + k > loadedMap.GetLength(0) - 1 || j + l > loadedMap.GetLength(1) - 1)
                                 tileInfoString += 1;
                             else
