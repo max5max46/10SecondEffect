@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-public class Shooter : MonoBehaviour
+public class Shooter : Obstacle
 {
-    [SerializeField] private GameObject bullet;
+    [SerializeField] private GameObject bulletPrefab;
 
     enum ShooterState
     {
@@ -16,11 +16,11 @@ public class Shooter : MonoBehaviour
     }
 
     private ShooterState state = ShooterState.Wait;
-    private int waitTime = 3;
-    private int currentWaitTime = 3;
+    private int waitTime = 2;
+    private int currentWaitTime = 2;
     private float shotSpeed = 1.0f;
 
-    public void OnOneSecondHasPassed(object source, EventArgs e) 
+    public override void OnOneSecondHasPassed(object source, EventArgs e) 
     {
         Debug.Log(state);
         switch (state) 
@@ -35,11 +35,14 @@ public class Shooter : MonoBehaviour
             case ShooterState.AboutToShoot:
                 state = ShooterState.Shoot;
                 break;
-
             case ShooterState.Shoot:
+                //Debug.Log(transform.position.x + " " + transform.position.y + " " + transform.position.z);
+                GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+
                 bullet.GetComponent<Bullet>().speed = shotSpeed;
-                Debug.Log(transform.position.x + " " + transform.position.y + " " + transform.position.z);
-                Instantiate(bullet, transform.position, transform.rotation);
+                //scales bullet according to shooter scale
+                bullet.transform.localScale = new Vector3(transform.localScale.x * bullet.transform.localScale.x, transform.localScale.y * bullet.transform.localScale.y, transform.localScale.z * bullet.transform.localScale.z);
+                
                 currentWaitTime = waitTime;
                 state = ShooterState.Wait;
                 break;

@@ -8,15 +8,7 @@ public class LevelManager : MonoBehaviour
     private double globalTimer = 0;
     private int globalTimerCheck = 1;
 
-    [SerializeField] private Shooter shooterScript;
-
     public event EventHandler OneSecondHasPassed;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        OneSecondHasPassed += shooterScript.OnOneSecondHasPassed;
-    }
 
     // Update is called once per frame
     void Update()
@@ -34,5 +26,10 @@ public class LevelManager : MonoBehaviour
         
         if (OneSecondHasPassed != null)
             OneSecondHasPassed(this, null);
+    }
+
+    public void SubscribeToOneSecondHasPassed(Obstacle script)
+    {
+        OneSecondHasPassed += script.OnOneSecondHasPassed;
     }
 }
