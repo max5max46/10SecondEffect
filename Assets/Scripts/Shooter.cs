@@ -18,11 +18,11 @@ public class Shooter : Obstacle
     private ShooterState state = ShooterState.Wait;
     private int waitTime = 2;
     private int currentWaitTime = 2;
-    private float shotSpeed = 1.0f;
+    private float shotSpeed = 0.5f;
 
     public override void OnOneSecondHasPassed(object source, EventArgs e) 
     {
-        Debug.Log(state);
+        //Debug.Log(state);
         switch (state) 
         {
             case ShooterState.Wait:

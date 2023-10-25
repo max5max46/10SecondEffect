@@ -16,6 +16,7 @@ public class LevelBuilder : MonoBehaviour
     [SerializeField] private GameObject wallTileThreeSides;
     [SerializeField] private GameObject wallTileFourSides;
     [SerializeField] private GameObject shooter;
+    [SerializeField] private GameObject spikes;
     [SerializeField] private float scale = 1;
 
 
@@ -26,7 +27,7 @@ public class LevelBuilder : MonoBehaviour
         public float yRotation;
         public int height;
         public GameObject gameObject;
-        public Tile(string name, GameObject asset, float yRotation = 0, int height = 0)
+        public Tile(string name = "Undefined", GameObject asset = null, float yRotation = 0, int height = 0)
         {
             this.name = name;
             this.asset = asset;
@@ -52,11 +53,13 @@ public class LevelBuilder : MonoBehaviour
 
             [Obstacle Layer]
             nothing = 0
+            spikes = 1
             shooter = 2
 
             [Properties]
             default = 0
             shooter facing direction = 0,1,2,3 (North, East, South, West)
+            spikes = 0,1 (Normal Timing, Alt Timing)
         */
         loadedMap = new int[,,]
         {
@@ -74,7 +77,7 @@ public class LevelBuilder : MonoBehaviour
         },
         {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0},
+                { 0, 1, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -103,7 +106,7 @@ public class LevelBuilder : MonoBehaviour
 
         Debug.Log("layer Amount:" + tileMap.GetLength(0) + " Y:" + tileMap.GetLength(1) + " X:" + tileMap.GetLength(2));
 
-        player.transform.position = new Vector3(player.transform.position.x, player.transform.position.y + (scale / 2) + (transform.localScale.y/2), player.transform.position.z);
+        player.transform.position = new Vector3(player.transform.position.x, player.transform.position.y + (scale / 2) + (transform.localScale.y / 2), player.transform.position.z);
 
         if (loadedMap.GetLength(2) % 2 == 0) xEvenOffset = scale / 2;
         if (loadedMap.GetLength(1) % 2 == 0) yEvenOffset = scale / 2;
@@ -114,7 +117,7 @@ public class LevelBuilder : MonoBehaviour
             for (int i = 0; i < tileMap.GetLength(1); i++)
                 for (int j = 0; j < tileMap.GetLength(2); j++)
                     //checks if the tile attempting to be instantiated is defined
-                    if (k == 0 || loadedMap[k, i, j] != 0)
+                    if (tileMap[k, i, j].asset != null)
                     {
                         //makes a instantance of an object based off the asset in tile, then sets the new object to the gameObject variable in the same tile
                         GameObject gObject = Instantiate(tileMap[k, i, j].asset, new Vector3(((-(tileMap.GetLength(1) / 2) + j) * scale) + xEvenOffset, tileMap[k, i, j].height * scale, (((tileMap.GetLength(0) / 2) - i) * scale) - yEvenOffset), Quaternion.Euler(new Vector3(0, tileMap[k, i, j].yRotation, 0)));
@@ -172,7 +175,7 @@ public class LevelBuilder : MonoBehaviour
 
                 //Debug.Log(tileInfoString);
 
-                if (tileInfoString[2] == '0')
+                if (tileInfoString[2] == '0' && loadedMap[1, i, j] == 0)
                     tileMap[0, i, j] = new Tile("Floor", floorTile, 0, 0);
                 else
                     switch (tileInfoString)
@@ -280,24 +283,31 @@ public class LevelBuilder : MonoBehaviour
             for (int j = 0; j < loadedMap.GetLength(2); j++)
                     switch (loadedMap[1, i, j])
                     {
-                        case 2:
-                            if (loadedMap[0, i, j] != 1)
-                                switch(loadedMap[2, i, j])
-                                {
-                                    case 0:
-                                        tileMap[1, i, j] = new Tile("ShooterNorth", shooter, 0, 1);
-                                        break;
-                                    case 1:
-                                        tileMap[1, i, j] = new Tile("ShooterEast", shooter, 90, 1);
-                                        break;
-                                    case 2:
-                                        tileMap[1, i, j] = new Tile("ShooterSouth", shooter, 180, 1);
-                                        break;
-                                    case 3:
-                                        tileMap[1, i, j] = new Tile("ShooterWest", shooter, 270, 1);
-                                        break;
-                                }
-                        break;
+
+                    case 1:
+                        if (loadedMap[0, i, j] != 1)
+                            tileMap[1, i, j] = new Tile("Spikes", spikes, 0, 0);
+                    break;
+
+                    case 2:
+                        if (loadedMap[0, i, j] != 1)
+                            switch(loadedMap[2, i, j])
+                            {
+                                case 0:
+                                    tileMap[1, i, j] = new Tile("ShooterNorth", shooter, 0, 1);
+                                    break;
+                                case 1:
+                                    tileMap[1, i, j] = new Tile("ShooterEast", shooter, 90, 1);
+                                    break;
+                                case 2:
+                                    tileMap[1, i, j] = new Tile("ShooterSouth", shooter, 180, 1);
+                                    break;
+                                case 3:
+                                    tileMap[1, i, j] = new Tile("ShooterWest", shooter, 270, 1);
+                                    break;
+                            }
+                    break;
+
                     }
     }
 }

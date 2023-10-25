@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Bullet : MonoBehaviour
 {
@@ -14,9 +15,15 @@ public class Bullet : MonoBehaviour
         rb.AddRelativeForce(new Vector3(0, 0, speed) * 1000);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        
+        if (other.gameObject.CompareTag("Player"))
+        {
+            Debug.Log("Player Hit (Bullet)");
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }
