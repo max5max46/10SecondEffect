@@ -20,7 +20,7 @@ public class LevelBuilder : MonoBehaviour
     [SerializeField] private float scale = 1;
 
 
-    private struct Tile
+    public struct Tile
     {
         public string name;
         public GameObject asset;
@@ -42,12 +42,12 @@ public class LevelBuilder : MonoBehaviour
     private GameObject[,] floorTiles;
     private GameObject[,] wallTiles;
 
-    private int[,,] loadedMap;
-    private Tile[,,] tileMap;
+    public int[,,] loadedMap;
+    public Tile[,,] tileMap;
 
 
     // Start is called before the first frame update
-    void Start()
+    public void Build()
     {
         player = GameObject.FindWithTag("Player");
 
@@ -84,23 +84,23 @@ public class LevelBuilder : MonoBehaviour
         {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 1, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0},
+                { 0, 0, 0, 0, 3, 0, 1, 0, 1, 0, 2, 0},
+                { 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 2, 0},
+                { 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 2, 0},
+                { 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0},
+                { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         },
         {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0},
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0},
+                { 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 3, 0},
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0},
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         }
         };

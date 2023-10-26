@@ -38,7 +38,7 @@ public class Spikes : Obstacle
 
     public override void OnOneSecondHasPassed(object source, EventArgs e)
     {
-        Debug.Log(state);
+        //Debug.Log(state);
         switch (state)
         {
             case SpikeState.Wait:

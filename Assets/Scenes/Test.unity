@@ -169,7 +169,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1220012cecd6ac74a8b3b02e434603e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 704315416}
   levelManager: {fileID: 108419583}
   floorTile: {fileID: 7779784770988981320, guid: ac8e530d41421124f95cca6e295226c6, type: 3}
   wallTileNoSides: {fileID: 5605779585339798211, guid: ea72769eb6ee2024ab7fc869d0d83ab9, type: 3}
@@ -193,6 +192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd9c750b36225df46821bcf054475e78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelBuilder: {fileID: 108419582}
 --- !u!1 &155090091
 GameObject:
   m_ObjectHideFlags: 0
@@ -891,6 +891,7 @@ MonoBehaviour:
   deceleration: 2
   cameraHeight: 5
   canMove: 0
+  rb: {fileID: 0}
   pausePressed: 0
   isHit: 0
 --- !u!135 &704315418
