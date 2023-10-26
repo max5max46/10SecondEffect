@@ -11,16 +11,23 @@ public class Player : MonoBehaviour
     [SerializeField] private float deceleration = 1;
     [SerializeField] private float cameraHeight = 5;
 
+    public bool canMove;
+
     private Rigidbody rb;
 
     private bool upPressed = false;
     private bool downPressed = false;
     private bool rightPressed = false;
     private bool leftPressed = false;
+    public bool pausePressed = false;
+
+    //anything that hits the player sets this to true, Program Manager then takes this info to handles the lose state
+    public bool isHit = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        canMove = true;
         camera.transform.position = new Vector3(transform.position.x, cameraHeight, transform.position.z);
         rb = GetComponent<Rigidbody>();
     }
@@ -31,18 +38,25 @@ public class Player : MonoBehaviour
         //Update camera to follow player
         camera.transform.position = new Vector3(transform.position.x, cameraHeight, transform.position.z);
 
-        //grabs player input and stores it
-        if (Input.GetKey(KeyCode.W))
-            upPressed = true;
+        if (canMove)
+        {
+            //grabs player input and stores it
+            if (Input.GetKey(KeyCode.W))
+                upPressed = true;
 
-        if (Input.GetKey(KeyCode.S))
-            downPressed = true;
+            if (Input.GetKey(KeyCode.S))
+                downPressed = true;
 
-        if (Input.GetKey(KeyCode.D))
-            rightPressed = true;
+            if (Input.GetKey(KeyCode.D))
+                rightPressed = true;
 
-        if (Input.GetKey(KeyCode.A))
-            leftPressed = true;
+            if (Input.GetKey(KeyCode.A))
+                leftPressed = true;
+        }
+
+        //used in Program Manager
+        if (Input.GetKey(KeyCode.P))
+            pausePressed = true;
     }
 
     private void FixedUpdate()

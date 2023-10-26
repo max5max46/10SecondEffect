@@ -9,7 +9,8 @@ public class SpikeTrigger : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Player Hit (Spikes)");
+            // Setting isHit to true causes a lose state
+            other.GetComponent<Player>().isHit = true;
         }
     }
 }
