@@ -13,7 +13,7 @@ public class Player : MonoBehaviour
 
     public bool canMove;
 
-    private Rigidbody rb;
+    public Rigidbody rb;
 
     private bool upPressed = false;
     private bool downPressed = false;

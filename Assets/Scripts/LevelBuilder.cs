@@ -6,7 +6,7 @@ using UnityEngine;
 public class LevelBuilder : MonoBehaviour
 {
 
-    public GameObject player;
+
     [SerializeField] private LevelManager levelManager;
     [SerializeField] private GameObject floorTile;
     [SerializeField] private GameObject wallTileNoSides;
@@ -37,8 +37,11 @@ public class LevelBuilder : MonoBehaviour
         }
     }
 
+    private GameObject player;
+
     private GameObject[,] floorTiles;
     private GameObject[,] wallTiles;
+
     private int[,,] loadedMap;
     private Tile[,,] tileMap;
 
@@ -46,6 +49,8 @@ public class LevelBuilder : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        player = GameObject.FindWithTag("Player");
+
         /* 
             [Level Layer]
             floor tile = 0
@@ -55,6 +60,7 @@ public class LevelBuilder : MonoBehaviour
             nothing = 0
             spikes = 1
             shooter = 2
+            player spawn = 3
 
             [Properties]
             default = 0
@@ -79,7 +85,7 @@ public class LevelBuilder : MonoBehaviour
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 1, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                { 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -112,31 +118,33 @@ public class LevelBuilder : MonoBehaviour
         if (loadedMap.GetLength(1) % 2 == 0) yEvenOffset = scale / 2;
 
 
-        // adds all game objects to scene using tileMap (k = layer, i = y, j = x)
+        // Adds all game objects to scene using tileMap (k = layer, i = y, j = x)
         for (int k = 0; k < 2; k++)
             for (int i = 0; i < tileMap.GetLength(1); i++)
                 for (int j = 0; j < tileMap.GetLength(2); j++)
-                    //checks if the tile attempting to be instantiated is defined
+                    // Checks if the tile attempting to be instantiated is defined
                     if (tileMap[k, i, j].asset != null)
                     {
-                        //makes a instantance of an object based off the asset in tile, then sets the new object to the gameObject variable in the same tile
+                        // Makes a instantance of an object based off the asset in tile, then sets the new object to the gameObject variable in the same tile
                         GameObject gObject = Instantiate(tileMap[k, i, j].asset, new Vector3(((-(tileMap.GetLength(1) / 2) + j) * scale) + xEvenOffset, tileMap[k, i, j].height * scale, (((tileMap.GetLength(0) / 2) - i) * scale) - yEvenOffset), Quaternion.Euler(new Vector3(0, tileMap[k, i, j].yRotation, 0)));
                         tileMap[k, i, j].gameObject = gObject;
 
-                        //all gameObjects change scale accordingly
+                        // All gameObjects change scale accordingly
                         tileMap[k, i, j].gameObject.transform.localScale = new Vector3(scale, scale, scale);
 
-                        //Subscribes all obstacles to the event One Second Has Passed
+                        // Subscribes all obstacles to the event One Second Has Passed
                         if (k == 1)
                             levelManager.SubscribeToOneSecondHasPassed(tileMap[k, i, j].gameObject.GetComponent<Obstacle>());
                     }
+                    else
+                    {
+                        // Sets Player spawn at the player spawn tile in the tile map
+                        if (tileMap[k, i, j].name == "PlayerSpawn")
+                            player.transform.position = new Vector3(((-(tileMap.GetLength(1) / 2) + j) * scale) + xEvenOffset, tileMap[k, i, j].height * scale, (((tileMap.GetLength(0) / 2) - i) * scale) - yEvenOffset);
+                    }
 
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+
     }
 
     private void IntMapToTileMap()
@@ -173,9 +181,8 @@ public class LevelBuilder : MonoBehaviour
                             tileInfoString += loadedMap[0, i, j];
                     }
 
-                //Debug.Log(tileInfoString);
 
-                if (tileInfoString[2] == '0' && loadedMap[1, i, j] == 0)
+                if (tileInfoString[2] == '0' && loadedMap[1, i, j] != 1)
                     tileMap[0, i, j] = new Tile("Floor", floorTile, 0, 0);
                 else
                     switch (tileInfoString)
@@ -281,13 +288,12 @@ public class LevelBuilder : MonoBehaviour
 
         for (int i = 0; i < loadedMap.GetLength(1); i++)
             for (int j = 0; j < loadedMap.GetLength(2); j++)
-                    switch (loadedMap[1, i, j])
-                    {
-
+                switch (loadedMap[1, i, j])
+                {
                     case 1:
                         if (loadedMap[0, i, j] != 1)
                             tileMap[1, i, j] = new Tile("Spikes", spikes, 0, 0);
-                    break;
+                        break;
 
                     case 2:
                         if (loadedMap[0, i, j] != 1)
@@ -306,8 +312,15 @@ public class LevelBuilder : MonoBehaviour
                                     tileMap[1, i, j] = new Tile("ShooterWest", shooter, 270, 1);
                                     break;
                             }
-                    break;
+                        break;
 
-                    }
+                    case 3:
+                        if (loadedMap[0, i, j] != 1)
+                            tileMap[1, i, j] = new Tile("PlayerSpawn", null, 0, 1);
+                        else
+                            Debug.LogError("Player spawn in invaild location");
+                        break;
+
+                }
     }
 }

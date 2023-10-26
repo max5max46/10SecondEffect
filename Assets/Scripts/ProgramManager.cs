@@ -36,6 +36,7 @@ public class ProgramManager : MonoBehaviour
     {
         // Swaps to lose state
         player.isHit = false;
+        player.rb.velocity = Vector3.zero;
         PauseGame();
         menuManager.ChangeMenu(2);
     }
