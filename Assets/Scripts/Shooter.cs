@@ -20,6 +20,11 @@ public class Shooter : Obstacle
     private int currentWaitTime = 2;
     private float shotSpeed = 0.5f;
 
+    private void Start()
+    {
+        levelMax = 5;
+    }
+
     public override void OnOneSecondHasPassed(object source, EventArgs e) 
     {
         //Debug.Log(state);
@@ -48,5 +53,10 @@ public class Shooter : Obstacle
                 break;
 
         }
+    }
+
+    public override void Upgrade()
+    {
+        Debug.Log("shooter Upgraded");
     }
 }

@@ -25,6 +25,8 @@ public class Spikes : Obstacle
 
     private void Start()
     {
+        levelMax = 3;
+
         if (altTiming)
             state = SpikeState.AboutToSpike;
 
@@ -50,15 +52,37 @@ public class Spikes : Obstacle
                 break;
 
             case SpikeState.AboutToSpike:
-                lerpTarget += 0.5f;
+                lerpTarget = spikeDefault.y + 0.5f;
                 state = SpikeState.Spike;
                 break;
             case SpikeState.Spike:
-                lerpTarget += 0.8f;
+                lerpTarget = spikeDefault.y + 1.3f;
                 currentWaitTime = waitTime;
-                state = SpikeState.Wait;
+                if (waitTime != -1)
+                    state = SpikeState.Wait;
+                else
+                    state = SpikeState.AboutToSpike;
                 break;
 
         }
     }
+
+    public override void Upgrade()
+    {
+        Debug.Log("spikes Upgraded");
+        switch (level) 
+        {
+            case 1:
+                waitTime = 0;
+                level++;
+                break;
+
+            case 2:
+                waitTime = -1;
+                level++;
+                break;
+        }   
+
+    }
+
 }
