@@ -3,9 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Shooter : Obstacle
 {
+    [SerializeField] private float shotSpeed;
+
+    [Header("Game Object References")]
     [SerializeField] private GameObject bulletPrefab;
 
     enum ShooterState
@@ -16,18 +20,17 @@ public class Shooter : Obstacle
     }
 
     private ShooterState state = ShooterState.Wait;
+    //Wait time in Seconds
     private int waitTime = 2;
-    private int currentWaitTime = 2;
-    private float shotSpeed = 0.5f;
+    private int currentWaitTime;
 
     private void Start()
     {
-        levelMax = 5;
+        currentWaitTime = waitTime;
     }
 
     public override void OnOneSecondHasPassed(object source, EventArgs e) 
     {
-        //Debug.Log(state);
         switch (state) 
         {
             case ShooterState.Wait:
@@ -40,16 +43,21 @@ public class Shooter : Obstacle
             case ShooterState.AboutToShoot:
                 state = ShooterState.Shoot;
                 break;
-            case ShooterState.Shoot:
-                //Debug.Log(transform.position.x + " " + transform.position.y + " " + transform.position.z);
-                GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
 
+            case ShooterState.Shoot:
+                GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+                // Passes shotSpeed to bullet
                 bullet.GetComponent<Bullet>().speed = shotSpeed;
-                //scales bullet according to shooter scale
+                // Scales bullet according to shooter scale
                 bullet.transform.localScale = new Vector3(transform.localScale.x * bullet.transform.localScale.x, transform.localScale.y * bullet.transform.localScale.y, transform.localScale.z * bullet.transform.localScale.z);
-                
-                currentWaitTime = waitTime;
-                state = ShooterState.Wait;
+                // If waitTime becomes negative, skip the Wait state 
+                if (waitTime >= 0)
+                {
+                    currentWaitTime = waitTime;
+                    state = ShooterState.Wait;
+                }
+                else
+                    state = ShooterState.AboutToShoot;
                 break;
 
         }
@@ -58,5 +66,26 @@ public class Shooter : Obstacle
     public override void Upgrade()
     {
         Debug.Log("shooter Upgraded");
+
+        level++;
+
+        switch (level)
+        {
+            case 2:
+                waitTime--;
+                break;
+
+            case 3:
+                shotSpeed *= 1.5f;
+                break;
+
+            case 4:
+                waitTime--;
+                break;
+
+            case 5:
+                waitTime--;
+                break;
+        }
     }
 }

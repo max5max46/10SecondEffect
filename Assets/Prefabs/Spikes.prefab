@@ -46,9 +46,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b75619dae88ed14ab9912a2e597a1c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  name: Spikes
+  levelMax: 3
+  spikeHalfOutHeight: 0.5
+  spikeFullOutHeight: 1.3
+  altTiming: 0
   spikeHolder: {fileID: 7791326194847554577}
   spike: {fileID: 7405206801754444831}
-  altTiming: 0
 --- !u!1 &7405206801754444831
 GameObject:
   m_ObjectHideFlags: 0

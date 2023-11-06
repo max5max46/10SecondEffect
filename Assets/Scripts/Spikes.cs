@@ -5,7 +5,11 @@ using UnityEngine;
 
 public class Spikes : Obstacle
 {
-    
+
+    [SerializeField] private float spikeHalfOutHeight;
+    [SerializeField] private float spikeFullOutHeight;
+
+    [Header("Game Object References")]
     [SerializeField] private GameObject spikeHolder;
     [SerializeField] private GameObject spike;
 
@@ -16,23 +20,27 @@ public class Spikes : Obstacle
         Spike
     }
 
-    public bool altTiming = false;
-    private SpikeState state = SpikeState.Wait;
+    //Wait time in Seconds
     private int waitTime = 1;
-    private int currentWaitTime = 1;
+    private int currentWaitTime;
+
+    [HideInInspector] public bool altTiming = false;
+    private SpikeState state = SpikeState.Wait;
     private float lerpTarget;
     private Vector3 spikeDefault;
 
+
     private void Start()
     {
-        levelMax = 3;
+        currentWaitTime = waitTime;
 
         if (altTiming)
-            state = SpikeState.AboutToSpike;
+            currentWaitTime += 2;
 
         spikeDefault = spike.transform.position;
         lerpTarget = spike.transform.position.y;
     }
+
     private void Update()
     {
         spike.transform.position = new Vector3(spikeDefault.x, Mathf.Lerp(spike.transform.position.y, lerpTarget, Time.deltaTime * 17), spikeDefault.z);
@@ -40,10 +48,10 @@ public class Spikes : Obstacle
 
     public override void OnOneSecondHasPassed(object source, EventArgs e)
     {
-        //Debug.Log(state);
         switch (state)
         {
             case SpikeState.Wait:
+
                 lerpTarget = spikeDefault.y;
                 if (currentWaitTime == 0)
                     state = SpikeState.AboutToSpike;
@@ -52,14 +60,21 @@ public class Spikes : Obstacle
                 break;
 
             case SpikeState.AboutToSpike:
-                lerpTarget = spikeDefault.y + 0.5f;
+
+                lerpTarget = spikeDefault.y + spikeHalfOutHeight;
                 state = SpikeState.Spike;
                 break;
+
             case SpikeState.Spike:
-                lerpTarget = spikeDefault.y + 1.3f;
-                currentWaitTime = waitTime;
-                if (waitTime != -1)
+
+                lerpTarget = spikeDefault.y + spikeFullOutHeight;
+
+                // If waitTime becomes negative, skip the Wait state
+                if (waitTime >= 0)
+                {
+                    currentWaitTime = waitTime;
                     state = SpikeState.Wait;
+                }
                 else
                     state = SpikeState.AboutToSpike;
                 break;
@@ -70,16 +85,17 @@ public class Spikes : Obstacle
     public override void Upgrade()
     {
         Debug.Log("spikes Upgraded");
+
+        level++;
+
         switch (level) 
         {
-            case 1:
-                waitTime = 0;
-                level++;
+            case 2:
+                waitTime--;
                 break;
 
-            case 2:
-                waitTime = -1;
-                level++;
+            case 3:
+                waitTime--;
                 break;
         }   
 

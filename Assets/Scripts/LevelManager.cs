@@ -66,6 +66,8 @@ public class LevelManager : MonoBehaviour
             RemoveMaxLevelObstacles();
             UpgradeRandomObstacle();
         }
+
+        UpdateUI();
     }
 
     protected virtual void OnOneSecondHasPassed()
@@ -118,5 +120,10 @@ public class LevelManager : MonoBehaviour
                             i = levelBuilder.tileMap.GetLength(1); j = levelBuilder.tileMap.GetLength(2);
                         }
         }
+    }
+
+    private void UpdateUI()
+    {
+
     }
 }
