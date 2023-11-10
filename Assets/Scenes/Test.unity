@@ -172,7 +172,7 @@ MonoBehaviour:
   levelManager: {fileID: 108419583}
   floorTile: {fileID: 7779784770988981320, guid: ac8e530d41421124f95cca6e295226c6, type: 3}
   wallTileNoSides: {fileID: 5605779585339798211, guid: ea72769eb6ee2024ab7fc869d0d83ab9, type: 3}
-  wallTileOneSide: {fileID: 3767674148411411477, guid: 3cb64a748c3979047a65421ff40d9934, type: 3}
+  wallTileOneSide: {fileID: 688337809699300638, guid: 3a95136c4aa036f4a905712144369871, type: 3}
   wallTileTwoSidesCorner: {fileID: 6260777747282787949, guid: 3587b28d0760b824cb4cfbe87ebe4f2b, type: 3}
   wallTileTwoSidesStraight: {fileID: 5164983229543737289, guid: 68f013a8dbd43734e9ce0a846f166d43, type: 3}
   wallTileThreeSides: {fileID: 7639562028052012938, guid: b0585e0cced80674ba46cd37e0a49795, type: 3}

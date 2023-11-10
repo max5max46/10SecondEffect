@@ -5,12 +5,7 @@ using UnityEngine;
 
 public class Spikes : Obstacle
 {
-
-    [SerializeField] private float spikeHalfOutHeight;
-    [SerializeField] private float spikeFullOutHeight;
-
     [Header("Game Object References")]
-    [SerializeField] private GameObject spikeHolder;
     [SerializeField] private GameObject spike;
 
     enum SpikeState
@@ -32,6 +27,8 @@ public class Spikes : Obstacle
 
     private void Start()
     {
+        name = Global.SPIKES_NAME;
+
         currentWaitTime = waitTime;
 
         if (altTiming)
@@ -43,10 +40,10 @@ public class Spikes : Obstacle
 
     private void Update()
     {
-        spike.transform.position = new Vector3(spikeDefault.x, Mathf.Lerp(spike.transform.position.y, lerpTarget, Time.deltaTime * 17), spikeDefault.z);
+        spike.transform.position = new Vector3(spikeDefault.x, Mathf.Lerp(spike.transform.position.y, lerpTarget, Time.deltaTime * Global.SPIKE_LAUNCH_SPEED), spikeDefault.z);
     }
 
-    public override void OnOneSecondHasPassed(object source, EventArgs e)
+    public override void ObstacleUpdate()
     {
         switch (state)
         {
@@ -61,13 +58,13 @@ public class Spikes : Obstacle
 
             case SpikeState.AboutToSpike:
 
-                lerpTarget = spikeDefault.y + spikeHalfOutHeight;
+                lerpTarget = spikeDefault.y + Global.SPIKES_HALF_OUT_HEIGHT;
                 state = SpikeState.Spike;
                 break;
 
             case SpikeState.Spike:
 
-                lerpTarget = spikeDefault.y + spikeFullOutHeight;
+                lerpTarget = spikeDefault.y + Global.SPIKES_FULL_OUT_HEIGHT;
 
                 // If waitTime becomes negative, skip the Wait state
                 if (waitTime >= 0)
@@ -96,6 +93,10 @@ public class Spikes : Obstacle
 
             case 3:
                 waitTime--;
+                break;
+
+            default:
+
                 break;
         }   
 

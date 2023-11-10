@@ -5,12 +5,11 @@ using UnityEngine;
 
 public class Obstacle : MonoBehaviour
 {
-    [Header("Properties")]
-    [SerializeField] protected string name;
-    [SerializeField] protected int levelMax;
-    protected int level = 1;
+    protected string name;
+    protected int levelMax { get; set; }
+    protected int level { get; set; }
 
-    public virtual void OnOneSecondHasPassed(object source, EventArgs e)
+    public virtual void ObstacleUpdate()
     {
 
     }
@@ -18,11 +17,6 @@ public class Obstacle : MonoBehaviour
     public virtual void Upgrade()
     {
 
-    }
-
-    public int GetLevel()
-    {
-        return level;
     }
 
     public bool IsObstacleAtMaxLevel()

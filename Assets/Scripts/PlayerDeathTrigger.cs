@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpikeTrigger : MonoBehaviour
+public class PlayerDeathTrigger : MonoBehaviour
 {
 
     private void OnTriggerEnter(Collider other)

@@ -7,8 +7,6 @@ using UnityEngine.UI;
 
 public class Shooter : Obstacle
 {
-    [SerializeField] private float shotSpeed;
-
     [Header("Game Object References")]
     [SerializeField] private GameObject bulletPrefab;
 
@@ -20,16 +18,21 @@ public class Shooter : Obstacle
     }
 
     private ShooterState state = ShooterState.Wait;
+    private float shotSpeed;
     //Wait time in Seconds
     private int waitTime = 2;
     private int currentWaitTime;
 
     private void Start()
     {
+        name = Global.SHOOTER_NAME;
+        levelMax = Global.SHOOTER_LEVEL_MAX;
+        shotSpeed = Global.SHOOTER_BASE_SHOT_SPEED;
+
         currentWaitTime = waitTime;
     }
 
-    public override void OnOneSecondHasPassed(object source, EventArgs e) 
+    public override void ObstacleUpdate() 
     {
         switch (state) 
         {
