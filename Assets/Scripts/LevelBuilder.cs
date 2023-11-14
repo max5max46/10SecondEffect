@@ -93,7 +93,7 @@ public class LevelBuilder : MonoBehaviour
         fileData.shooterMaxLevel = 5;
         fileData.shooterStartingLevel = 1;
 
-        fileData.isLavaOn = true;
+        fileData.isLavaOn = false;
         fileData.lavaMaxLevel = 1;
         fileData.lavaStartingLevel = 1;
 
@@ -131,15 +131,19 @@ public class LevelBuilder : MonoBehaviour
                         levelData.tileMap[k, i, j].gameObject.transform.localScale = new Vector3(levelData.scale, levelData.scale, levelData.scale);
 
                         // All obstacle
-                        /*switch (levelData.tileMap[k, i, j].name)
+                        switch (levelData.tileMap[k, i, j].name)
                         {
                             case Global.SPIKES_NAME:
-                                levelData.tileMap[k, i, j].gameObject.GetComponent<Obstacle>().Set
+                                levelData.tileMap[k, i, j].gameObject.GetComponent<Obstacle>().SetStartingLevel(levelData.spikesStartingLevel);
+                                levelData.tileMap[k, i, j].gameObject.GetComponent<Obstacle>().SetMaxLevel(levelData.spikesMaxLevel);
+                                if (levelData.tileMap[k, i, j].spikeAltTiming)
+                                    levelData.tileMap[k, i, j].gameObject.GetComponent<Spikes>().altTiming = true;
                                 break;
                             case Global.SHOOTER_NAME:
-
+                                levelData.tileMap[k, i, j].gameObject.GetComponent<Obstacle>().SetStartingLevel(levelData.shooterStartingLevel);
+                                levelData.tileMap[k, i, j].gameObject.GetComponent<Obstacle>().SetMaxLevel(levelData.shooterMaxLevel);
                                 break;
-                        }*/
+                        }
                     }
                     else
                     {
@@ -174,7 +178,7 @@ public class LevelBuilder : MonoBehaviour
         levelData.lavaMaxLevel = fileData.lavaMaxLevel;
         levelData.lavaStartingLevel = fileData.lavaStartingLevel;
 
-        FillObstacleTypeList(levelData);
+        levelData.obstacleTypesInLevel = FillObstacleTypeList(levelData);
         return levelData;
     }
 
@@ -367,26 +371,33 @@ public class LevelBuilder : MonoBehaviour
         return tileMap;
     }
 
-    private void FillObstacleTypeList(LevelData levelData)
+    private List<string> FillObstacleTypeList(LevelData levelData)
     {
+        
+        List<string> obstacleTypesInLevel = new List<string>();
         // Populates a list (obstacleTypesInLevel) with the names of each obstacle type currently in the level data
         for (int i = 0; i < levelData.tileMap.GetLength(1); i++)
             for (int j = 0; j < levelData.tileMap.GetLength(2); j++)
                 // Skips all obstacles (tiles on the obstacle layer) that are not assigned
                 if (levelData.tileMap[1, i, j].name != null)
+                {
                     // Checks obstacle names and adds said name if it is defined in the switch statment and has yet to be added to the list (obstacleTypesInLevel), then adds that name to the list (obstacleTypesInLevel)
+                    Debug.Log(levelData.tileMap[1, i, j].name);
                     switch (levelData.tileMap[1, i, j].name)
                     {
-                        case var _ when levelData.tileMap[1, i, j].name.Contains(Global.SPIKES_NAME) && !levelData.obstacleTypesInLevel.Contains(Global.SPIKES_NAME):
-                            levelData.obstacleTypesInLevel.Add(Global.SPIKES_NAME);
+                        case var _ when levelData.tileMap[1, i, j].name == Global.SPIKES_NAME && !obstacleTypesInLevel.Contains(Global.SPIKES_NAME):
+                            obstacleTypesInLevel.Add(Global.SPIKES_NAME);
                             break;
 
-                        case var _ when levelData.tileMap[1, i, j].name.Contains(Global.SHOOTER_NAME) && !levelData.obstacleTypesInLevel.Contains(Global.SHOOTER_NAME):
-                            levelData.obstacleTypesInLevel.Add(Global.SHOOTER_NAME);
+                        case var _ when levelData.tileMap[1, i, j].name == Global.SHOOTER_NAME && !obstacleTypesInLevel.Contains(Global.SHOOTER_NAME):
+                            obstacleTypesInLevel.Add(Global.SHOOTER_NAME);
                             break;
                     }
+                }
 
         if (levelData.isLavaOn)
-            levelData.obstacleTypesInLevel.Add(Global.LAVA_NAME);
+            obstacleTypesInLevel.Add(Global.LAVA_NAME);
+
+        return obstacleTypesInLevel;
     }
 }

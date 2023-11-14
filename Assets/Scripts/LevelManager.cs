@@ -42,11 +42,11 @@ public class LevelManager : MonoBehaviour
     // Is called after every "ten" seconds (CHANGE LATER), Upgrades obstucles and changes visual effects (IN PROGRESS)
     private void TenSecondEffect()
     {
+
         if (levelData.obstacleTypesInLevel.Count != 0)
-        {
             RemoveMaxLevelObstacles();
+        if (levelData.obstacleTypesInLevel.Count != 0)
             UpgradeRandomObstacle();
-        }
 
         UpdateUI();
     }
@@ -56,7 +56,7 @@ public class LevelManager : MonoBehaviour
     {
         for (int i = 0; i < levelData.tileMap.GetLength(1); i++)
             for (int j = 0; j < levelData.tileMap.GetLength(2); j++)
-                if (levelData.tileMap[1, i, j].name != null)
+                if (levelData.tileMap[1, i, j].gameObject != null)
                     levelData.tileMap[1, i, j].gameObject.GetComponent<Obstacle>().ObstacleUpdate();
     }
 

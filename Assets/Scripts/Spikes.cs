@@ -28,7 +28,6 @@ public class Spikes : Obstacle
     private void Start()
     {
         name = Global.SPIKES_NAME;
-
         currentWaitTime = waitTime;
 
         if (altTiming)

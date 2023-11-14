@@ -19,6 +19,16 @@ public class Obstacle : MonoBehaviour
 
     }
 
+    public void SetStartingLevel(int level)
+    {
+        this.level = level;
+    }
+
+    public void SetMaxLevel(int levelMax)
+    {
+        this.levelMax = levelMax;
+    }
+
     public bool IsObstacleAtMaxLevel()
     {
         if (level < levelMax)

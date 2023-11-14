@@ -26,9 +26,7 @@ public class Shooter : Obstacle
     private void Start()
     {
         name = Global.SHOOTER_NAME;
-        levelMax = Global.SHOOTER_LEVEL_MAX;
         shotSpeed = Global.SHOOTER_BASE_SHOT_SPEED;
-
         currentWaitTime = waitTime;
     }
 
