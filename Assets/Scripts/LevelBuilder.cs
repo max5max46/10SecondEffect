@@ -4,11 +4,11 @@ using System.Linq;
 using UnityEngine;
 using static Structs;
 using UnityEngine.Tilemaps;
+using UnityEngine.WSA;
+using UnityEditor.Experimental.GraphView;
 
 public class LevelBuilder : MonoBehaviour
 {
-
-
     [SerializeField] private GameObject floorTile;
     [SerializeField] private GameObject wallTileNoSides;
     [SerializeField] private GameObject wallTileOneSide;
@@ -20,14 +20,29 @@ public class LevelBuilder : MonoBehaviour
     [SerializeField] private GameObject spikes;
     [SerializeField] private GameObject lava;
 
-
-    
-
     private GameObject player;
 
-    public LoadedLevelData TestDataFill()
+
+    public LevelData LoadAndBuildLevel()
     {
-        LoadedLevelData fileData = new LoadedLevelData();
+        player = GameObject.FindWithTag("Player");
+
+        //Loads File Data
+        FileData fileData = TestDataFill();
+
+        //Converts to Level Data
+        LevelData levelData = FileDataToLevelData(fileData);
+
+        //Builds From Level Data
+        BuildLevel(levelData);
+
+        //Pass Back to Manager
+        return levelData;
+    }
+
+    public FileData TestDataFill()
+    {
+        FileData fileData = new FileData();
 
         fileData.name = "Test Level";
 
@@ -101,72 +116,11 @@ public class LevelBuilder : MonoBehaviour
         return fileData;
     }
 
-    public LevelData LoadAndBuildLevel()
-    {
-        player = GameObject.FindWithTag("Player");
-
-        LevelData levelData = FileDataToLevelData();
-
-        float xEvenOffset = 0;
-        float yEvenOffset = 0;
-
-        player.transform.position = new Vector3(player.transform.position.x, player.transform.position.y + (levelData.scale / 2) + (transform.localScale.y / 2), player.transform.position.z);
-
-        if (levelData.tileMap.GetLength(2) % 2 == 0) xEvenOffset = levelData.scale / 2;
-        if (levelData.tileMap.GetLength(1) % 2 == 0) yEvenOffset = levelData.scale / 2;
-
-
-        // Adds all game objects to scene using tileMap (k = layer, i = y, j = x)
-        for (int k = 0; k < 2; k++)
-            for (int i = 0; i < levelData.tileMap.GetLength(1); i++)
-                for (int j = 0; j < levelData.tileMap.GetLength(2); j++)
-                    // Checks if the tile attempting to be instantiated is defined
-                    if (levelData.tileMap[k, i, j].asset != null)
-                    {
-                        // Makes a instantance of an object based off the asset in tile, then sets the new object to the gameObject variable in the same tile
-                        GameObject gObject = Instantiate(levelData.tileMap[k, i, j].asset, new Vector3(((-(levelData.tileMap.GetLength(1) / 2) + j) * levelData.scale) + xEvenOffset, levelData.tileMap[k, i, j].height * levelData.scale, (((levelData.tileMap.GetLength(0) / 2) - i) * levelData.scale) - yEvenOffset), Quaternion.Euler(new Vector3(0, levelData.tileMap[k, i, j].yRotation, 0)));
-                        levelData.tileMap[k, i, j].gameObject = gObject;
-
-                        // All gameObjects change scale accordingly
-                        levelData.tileMap[k, i, j].gameObject.transform.localScale = new Vector3(levelData.scale, levelData.scale, levelData.scale);
-
-                        // All obstacle
-                        switch (levelData.tileMap[k, i, j].name)
-                        {
-                            case Global.SPIKES_NAME:
-                                levelData.tileMap[k, i, j].gameObject.GetComponent<Obstacle>().SetStartingLevel(levelData.spikesStartingLevel);
-                                levelData.tileMap[k, i, j].gameObject.GetComponent<Obstacle>().SetMaxLevel(levelData.spikesMaxLevel);
-                                if (levelData.tileMap[k, i, j].spikeAltTiming)
-                                    levelData.tileMap[k, i, j].gameObject.GetComponent<Spikes>().altTiming = true;
-                                break;
-                            case Global.SHOOTER_NAME:
-                                levelData.tileMap[k, i, j].gameObject.GetComponent<Obstacle>().SetStartingLevel(levelData.shooterStartingLevel);
-                                levelData.tileMap[k, i, j].gameObject.GetComponent<Obstacle>().SetMaxLevel(levelData.shooterMaxLevel);
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        // Sets Player spawn at the player spawn tile in the tile map
-                        if (levelData.tileMap[k, i, j].name == "PlayerSpawn")
-                            player.transform.position = new Vector3(((-(levelData.tileMap.GetLength(1) / 2) + j) * levelData.scale) + xEvenOffset, levelData.tileMap[k, i, j].height * levelData.scale, (((levelData.tileMap.GetLength(0) / 2) - i) * levelData.scale) - yEvenOffset);
-                    }
-
-        //Add all game objects not on the tile map
-        if (levelData.isLavaOn)
-        {
-
-        }
-
-
-        return levelData;
-    }
-
-    private LevelData FileDataToLevelData()
+    private LevelData FileDataToLevelData(FileData fileData)
     {
         LevelData levelData = new LevelData();
-        LoadedLevelData fileData = TestDataFill();
 
+        // Fills in levelData using fileData
         levelData.name = fileData.name;
         levelData.tileMap = IntMapToTileMap(fileData.intMap);
         levelData.scale = fileData.scale;
@@ -177,227 +131,302 @@ public class LevelBuilder : MonoBehaviour
         levelData.isLavaOn = fileData.isLavaOn;
         levelData.lavaMaxLevel = fileData.lavaMaxLevel;
         levelData.lavaStartingLevel = fileData.lavaStartingLevel;
-
         levelData.obstacleTypesInLevel = FillObstacleTypeList(levelData);
+
         return levelData;
-    }
 
-    private Structs.Tile[,,] IntMapToTileMap(int[,,] intMap)
-    {
-        Structs.Tile[,,] tileMap = new Structs.Tile[intMap.GetLength(0), intMap.GetLength(1), intMap.GetLength(2)];
+        // Converts the intMap data into tileMap data
+        Structs.Tile[,,] IntMapToTileMap(int[,,] intMap)
+        {
+            int layer = intMap.GetLength(0);
+            int depth = intMap.GetLength(1);
+            int width = intMap.GetLength(2);
 
-        //looks through all tiles and there surroundings to find what kind of tile they should be (ex: a one sided wall facing North)
-        for (int i = 0; i < intMap.GetLength(1); i++)
-            for (int j = 0; j < intMap.GetLength(2); j++)
-            {
-                string tileInfoString = "";
-                /*this checks all map tiles around the one we're looking and simplifies it into a string of 5 digits
-                 "01101" looks like:
+            Structs.Tile[,,] tileMap = new Structs.Tile[layer, depth, width];
 
-                    0     100
-                   110 or 110 (*corners are not inculed in the string)
-                    1     111
-                
-                 on the map */
-                for (int k = -1; k < 2; k++)
-                    for (int l = -1; l < 2; l++)
-                    {
-                        //stops corners from being put in the string (removes the origin tile [i,j])
-                        if (k != l && k + l != 0)
-                        {
-                            //checks if the tile looked at is outside the map data, if it is, default to a wall
-                            if (i + k < 0 || j + l < 0 || i + k > intMap.GetLength(1) - 1 || j + l > intMap.GetLength(2) - 1)
-                                tileInfoString += 1;
-                            else
-                                tileInfoString += intMap[0, i + k, j + l];
-                        }
-                        //puts the origin tile [i,j] back in the string
-                        if (k == 0 && l == 0)
-                            tileInfoString += intMap[0, i, j];
-                    }
-
-                // Checks the tileInfoString against all possible wall configurations to find out what asset and rotation each should be
-                if (tileInfoString[2] == '0' && intMap[1, i, j] != 1)
-                    tileMap[0, i, j] = new Structs.Tile("Floor", floorTile, 0, 0);
-                else
-                    switch (tileInfoString)
-                    {
-                        case "1" +
-                            "111" +
-                             "1":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileNoSides", wallTileNoSides, 0, 1);
-                            break;
-
-                        case "0" +
-                            "111" +
-                             "1":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileOneSideNorth", wallTileOneSide, 0, 1);
-                            break;
-
-                        case "1" +
-                            "110" +
-                             "1":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileOneSideEast", wallTileOneSide, 90, 1);
-                            break;
-
-                        case  "1" +
-                             "111" +
-                              "0":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileOneSideSouth", wallTileOneSide, 180, 1);
-                            break;
-
-                        case  "1" +
-                             "011" +
-                              "1":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileOneSideWest", wallTileOneSide, 270, 1);
-                            break;
-
-                        case  "0" +
-                             "110" +
-                              "1":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileTwoSidesCornerNorth", wallTileTwoSidesCorner, 0, 1);
-                            break;
-
-                        case  "1" +
-                             "110" +
-                              "0":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileTwoSidesCornerEast", wallTileTwoSidesCorner, 90, 1);
-                            break;
-
-                        case  "1" +
-                             "011" +
-                              "0":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileTwoSidesCornerSouth", wallTileTwoSidesCorner, 180, 1);
-                            break;
-
-                        case  "0" +
-                             "011" +
-                              "1":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileTwoSidesCornerWest", wallTileTwoSidesCorner, 270, 1);
-                            break;
-
-                        case  "0" +
-                             "111" +
-                              "0":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileTwoSidesStraightHorizontal", wallTileTwoSidesStraight, 0, 1);
-                            break;
-
-                        case  "1" +
-                             "010" +
-                              "1":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileTwoSidesStraightVertical", wallTileTwoSidesStraight, 90, 1);
-                            break;
-
-                        case  "0" +
-                             "010" +
-                              "1":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileThreeSidesNorth", wallTileThreeSides, 0, 1);
-                            break;
-
-                        case  "0" +
-                             "110" +
-                              "0":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileThreeSidesEast", wallTileThreeSides, 90, 1);
-                            break;
-
-                        case  "1" +
-                             "010" +
-                              "0":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileThreeSidesSouth", wallTileThreeSides, 180, 1);
-                            break;
-
-                        case  "0" +
-                             "011" +
-                              "0":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileThreeSidesWest", wallTileThreeSides, 270, 1);
-                            break;
-
-                        case  "0" +
-                             "010" +
-                              "0":
-                            tileMap[0, i, j] = new Structs.Tile("WallTileFourSides", wallTileFourSides, 0, 1);
-                            break;
-
-                    }
-            }
-
-        // Checks the obstacle and properties layer and adds said obstacles and there properties to the tile map
-        for (int i = 0; i < intMap.GetLength(1); i++)
-            for (int j = 0; j < intMap.GetLength(2); j++)
-                switch (intMap[1, i, j])
+            //looks through all tiles and there surroundings to find what kind of tile they should be (ex: a one sided wall facing North)
+            for (int y = 0; y < depth; y++)
+                for (int x = 0; x < width; x++)
                 {
-                    // Adds spikes to tile map
-                    case 1:
-                        if (intMap[0, i, j] != 1)
-                        {
-                            tileMap[1, i, j] = new Structs.Tile(Global.SPIKES_NAME, spikes, 0, 0);
-                            // Checks the properties layer to see if the spikes are using alt timing
-                            if (intMap[2, i, j] == 1)
-                                tileMap[1, i, j].spikeAltTiming = true;
-                        }
-                        break;
+                    string tileInfoString = "";
+                    /*this checks all map tiles around the one we're looking and simplifies it into a string of 5 digits
+                     "01101" looks like:
 
-                    // Adds shooters to tile map
-                    case 2:
-                        if (intMap[0, i, j] != 1)
+                        0     100
+                       110 or 110 (*corners are not inculed in the string)
+                        1     111
+
+                     on the map */
+                    for (int i = -1; i < 2; i++)
+                        for (int j = -1; j < 2; j++)
                         {
-                            tileMap[1, i, j] = new Structs.Tile(Global.SHOOTER_NAME, shooter, 0, 1);
-                            // Checks the properties layer to see which direction the shooter being added should point
-                            switch (intMap[2, i, j])
+                            //stops corners from being put in the string (removes the origin tile [i,j])
+                            if (i != j && i + j != 0)
                             {
-                                case 1:
-                                    tileMap[1, i, j].yRotation = 90;
-                                    break;
-                                case 2:
-                                    tileMap[1, i, j].yRotation = 180;
-                                    break;
-                                case 3:
-                                    tileMap[1, i, j].yRotation = 270;
-                                    break;
+                                //checks if the tile looked at is outside the map data, if it is, default to a wall
+                                if (y + i < 0 || x + j < 0 || y + i > depth - 1 || x + j > width - 1)
+                                    tileInfoString += 1;
+                                else
+                                    tileInfoString += intMap[0, y + i, x + j];
                             }
+                            //puts the origin tile [i,j] back in the string
+                            if (i == 0 && j == 0)
+                                tileInfoString += intMap[0, y, x];
                         }
-                        break;
 
-                    // Adds the player spawn to the tile map
-                    case 3:
-                        if (intMap[0, i, j] != 1)
-                            tileMap[1, i, j] = new Structs.Tile("PlayerSpawn", null, 0, 1);
-                        else
-                            Debug.LogError("Player spawn in invaild location");
-                        break;
+                    // Checks the tileInfoString against all possible wall configurations to find out what asset and rotation each should be
+                    if (tileInfoString[2] == '0' && intMap[1, y, x] != 1)
+                        tileMap[0, y, x] = new Structs.Tile("Floor", floorTile, 0, 0);
+                    else
+                        switch (tileInfoString)
+                        {
+                            case "1" +
+                                "111" +
+                                 "1":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileNoSides", wallTileNoSides, 0, 1);
+                                break;
 
+                            case "0" +
+                                "111" +
+                                 "1":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileOneSideNorth", wallTileOneSide, 0, 1);
+                                break;
+
+                            case "1" +
+                                "110" +
+                                 "1":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileOneSideEast", wallTileOneSide, 90, 1);
+                                break;
+
+                            case "1" +
+                                 "111" +
+                                  "0":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileOneSideSouth", wallTileOneSide, 180, 1);
+                                break;
+
+                            case "1" +
+                                 "011" +
+                                  "1":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileOneSideWest", wallTileOneSide, 270, 1);
+                                break;
+
+                            case "0" +
+                                 "110" +
+                                  "1":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileTwoSidesCornerNorth", wallTileTwoSidesCorner, 0, 1);
+                                break;
+
+                            case "1" +
+                                 "110" +
+                                  "0":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileTwoSidesCornerEast", wallTileTwoSidesCorner, 90, 1);
+                                break;
+
+                            case "1" +
+                                 "011" +
+                                  "0":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileTwoSidesCornerSouth", wallTileTwoSidesCorner, 180, 1);
+                                break;
+
+                            case "0" +
+                                 "011" +
+                                  "1":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileTwoSidesCornerWest", wallTileTwoSidesCorner, 270, 1);
+                                break;
+
+                            case "0" +
+                                 "111" +
+                                  "0":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileTwoSidesStraightHorizontal", wallTileTwoSidesStraight, 0, 1);
+                                break;
+
+                            case "1" +
+                                 "010" +
+                                  "1":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileTwoSidesStraightVertical", wallTileTwoSidesStraight, 90, 1);
+                                break;
+
+                            case "0" +
+                                 "010" +
+                                  "1":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileThreeSidesNorth", wallTileThreeSides, 0, 1);
+                                break;
+
+                            case "0" +
+                                 "110" +
+                                  "0":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileThreeSidesEast", wallTileThreeSides, 90, 1);
+                                break;
+
+                            case "1" +
+                                 "010" +
+                                  "0":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileThreeSidesSouth", wallTileThreeSides, 180, 1);
+                                break;
+
+                            case "0" +
+                                 "011" +
+                                  "0":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileThreeSidesWest", wallTileThreeSides, 270, 1);
+                                break;
+
+                            case "0" +
+                                 "010" +
+                                  "0":
+                                tileMap[0, y, x] = new Structs.Tile("WallTileFourSides", wallTileFourSides, 0, 1);
+                                break;
+
+                        }
                 }
 
-        return tileMap;
+            // Checks the obstacle and properties layer and adds said obstacles and there properties to the tile map
+            for (int y = 0; y < depth; y++)
+                for (int x = 0; x < width; x++)
+                    switch (intMap[1, y, x])
+                    {
+                        // Adds spikes to tile map
+                        case 1:
+                            if (intMap[0, y, x] != 1)
+                            {
+                                tileMap[1, y, x] = new Structs.Tile(Global.SPIKES_NAME, spikes, 0, 0);
+                                // Checks the properties layer to see if the spikes are using alt timing
+                                if (intMap[2, y, x] == 1)
+                                    tileMap[1, y, x].spikeAltTiming = true;
+                            }
+                            break;
+
+                        // Adds shooters to tile map
+                        case 2:
+                            if (intMap[0, y, x] != 1)
+                            {
+                                tileMap[1, y, x] = new Structs.Tile(Global.SHOOTER_NAME, shooter, 0, 1);
+                                // Checks the properties layer to see which direction the shooter being added should point
+                                switch (intMap[2, y, x])
+                                {
+                                    case 1:
+                                        tileMap[1, y, x].yRotation = 90;
+                                        break;
+                                    case 2:
+                                        tileMap[1, y, x].yRotation = 180;
+                                        break;
+                                    case 3:
+                                        tileMap[1, y, x].yRotation = 270;
+                                        break;
+                                }
+                            }
+                            break;
+
+                        // Adds the player spawn to the tile map
+                        case 3:
+                            if (intMap[0, y, x] != 1)
+                                tileMap[1, y, x] = new Structs.Tile("PlayerSpawn", null, 0, 1);
+                            else
+                                Debug.LogError("Player spawn in invaild location");
+                            break;
+
+                    }
+
+            return tileMap;
+        }
+
+        // Fills the Obstacle List to be used later
+        List<string> FillObstacleTypeList(LevelData levelData)
+        {
+            int depth = levelData.tileMap.GetLength(1);
+            int width = levelData.tileMap.GetLength(2);
+
+            List<string> obstacleTypesInLevel = new List<string>();
+
+            // Populates a list (obstacleTypesInLevel) with the names of each obstacle type currently in the level data
+            for (int y = 0; y < depth; y++)
+                for (int x = 0; x < width; x++)
+                    // Skips all obstacles (tiles on the obstacle layer) that are not assigned
+                    if (levelData.tileMap[1, y, x].name != null)
+                    {
+                        // Checks obstacle names and adds said name if it is defined in the switch statment and has yet to be added to the list (obstacleTypesInLevel), then adds that name to the list (obstacleTypesInLevel)
+                        Debug.Log(levelData.tileMap[1, y, x].name);
+                        switch (levelData.tileMap[1, y, x].name)
+                        {
+                            case var _ when levelData.tileMap[1, y, x].name == Global.SPIKES_NAME && !obstacleTypesInLevel.Contains(Global.SPIKES_NAME):
+                                obstacleTypesInLevel.Add(Global.SPIKES_NAME);
+                                break;
+
+                            case var _ when levelData.tileMap[1, y, x].name == Global.SHOOTER_NAME && !obstacleTypesInLevel.Contains(Global.SHOOTER_NAME):
+                                obstacleTypesInLevel.Add(Global.SHOOTER_NAME);
+                                break;
+                        }
+                    }
+
+            if (levelData.isLavaOn)
+                obstacleTypesInLevel.Add(Global.LAVA_NAME);
+
+            return obstacleTypesInLevel;
+        }
     }
 
-    private List<string> FillObstacleTypeList(LevelData levelData)
+    private void BuildLevel(LevelData levelData)
     {
-        
-        List<string> obstacleTypesInLevel = new List<string>();
-        // Populates a list (obstacleTypesInLevel) with the names of each obstacle type currently in the level data
-        for (int i = 0; i < levelData.tileMap.GetLength(1); i++)
-            for (int j = 0; j < levelData.tileMap.GetLength(2); j++)
-                // Skips all obstacles (tiles on the obstacle layer) that are not assigned
-                if (levelData.tileMap[1, i, j].name != null)
-                {
-                    // Checks obstacle names and adds said name if it is defined in the switch statment and has yet to be added to the list (obstacleTypesInLevel), then adds that name to the list (obstacleTypesInLevel)
-                    Debug.Log(levelData.tileMap[1, i, j].name);
-                    switch (levelData.tileMap[1, i, j].name)
-                    {
-                        case var _ when levelData.tileMap[1, i, j].name == Global.SPIKES_NAME && !obstacleTypesInLevel.Contains(Global.SPIKES_NAME):
-                            obstacleTypesInLevel.Add(Global.SPIKES_NAME);
-                            break;
+        int depth = levelData.tileMap.GetLength(1);
+        int width = levelData.tileMap.GetLength(2);
 
-                        case var _ when levelData.tileMap[1, i, j].name == Global.SHOOTER_NAME && !obstacleTypesInLevel.Contains(Global.SHOOTER_NAME):
-                            obstacleTypesInLevel.Add(Global.SHOOTER_NAME);
-                            break;
+        // Adds a offset to everything depending on whether or not there is a even amount of tiles in either the x or y in tileMap to keep things centered
+        float yEvenOffset = 0;
+        float xEvenOffset = 0;
+        if (depth % 2 == 0) yEvenOffset = levelData.scale / 2;
+        if (width % 2 == 0) xEvenOffset = levelData.scale / 2;
+
+        // Adds all game objects to scene using tileMap (k = layer, i = y, j = x)
+        for (int layer = 0; layer < 2; layer++)
+            for (int y = 0; y < depth; y++)
+                for (int x = 0; x < width; x++)
+                {
+                    //Unpacking some variables
+                    Structs.Tile tile = levelData.tileMap[layer, y, x];
+                    float xPos = (((width / 2) + x) * levelData.scale) + xEvenOffset;
+                    float yPos = tile.height * levelData.scale;
+                    float zPos = (((depth / 2) - y) * levelData.scale) - yEvenOffset;
+                    Vector3 tilePosition = new Vector3(xPos, yPos, zPos);
+
+                    // Checks if the tile attempting to be instantiated has its asset (prefab) defined
+                    if (tile.asset != null)
+                    {
+                        // Makes a instantance of an object based off the asset in tile, then sets the new object to the gameObject variable in the same tile
+                        GameObject gObject = Instantiate(tile.asset, tilePosition, Quaternion.Euler(new Vector3(0, tile.yRotation, 0)));
+                        tile.gameObject = gObject;
+
+                        // All gameObjects change scale accordingly
+                        tile.gameObject.transform.localScale = new Vector3(levelData.scale, levelData.scale, levelData.scale);
+
+                        // All obstacles are given their unique properties
+                        switch (tile.name)
+                        {
+                            case Global.SPIKES_NAME:
+                                tile.gameObject.GetComponent<Obstacle>().SetStartingLevel(levelData.spikesStartingLevel);
+                                tile.gameObject.GetComponent<Obstacle>().SetMaxLevel(levelData.spikesMaxLevel);
+                                if (tile.spikeAltTiming)
+                                    tile.gameObject.GetComponent<Spikes>().altTiming = true;
+                                break;
+                            case Global.SHOOTER_NAME:
+                                tile.gameObject.GetComponent<Obstacle>().SetStartingLevel(levelData.shooterStartingLevel);
+                                tile.gameObject.GetComponent<Obstacle>().SetMaxLevel(levelData.shooterMaxLevel);
+                                break;
+                        }
+
+                        //Gives tile back to the tile map
+                        levelData.tileMap[layer, y, x] = tile;
+                    }
+                    else
+                    {
+                        // Sets Player spawn at the player spawn tile in the tile map
+                        if (tile.name == "PlayerSpawn")
+                            player.transform.position = tilePosition;
                     }
                 }
 
+        //Add all game objects not on the tile map
         if (levelData.isLavaOn)
-            obstacleTypesInLevel.Add(Global.LAVA_NAME);
+        {
 
-        return obstacleTypesInLevel;
+        }
     }
 }

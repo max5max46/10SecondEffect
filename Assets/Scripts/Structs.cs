@@ -23,7 +23,7 @@ public class Structs : MonoBehaviour
         }
     }
 
-    public struct LoadedLevelData
+    public struct FileData
     {
         public string name;
         public int[,,] intMap;
