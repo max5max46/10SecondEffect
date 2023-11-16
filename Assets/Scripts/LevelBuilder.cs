@@ -111,7 +111,7 @@ public class LevelBuilder : MonoBehaviour
         fileData.shooterStartingLevel = 1;
 
         fileData.isLavaOn = true;
-        fileData.lavaMaxLevel = 1;
+        fileData.lavaMaxLevel = 10;
         fileData.lavaStartingLevel = 1;
 
 

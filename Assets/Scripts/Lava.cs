@@ -15,15 +15,19 @@ public class Lava : Obstacle
         Right
     }
 
-    private int waitTime = 5;
+    private int waitTime = Global.LAVA_DEFAULT_WAIT_TIME;
     private int currentWaitTime;
 
     private ApproachingSide approachingSide;
     private Vector3 lavaDefault;
-    private float lerpTarget;
-    private float perivousDistanceBetweenLavaPools;
-    private float distanceBetweenLavaPools;
+    private Vector3 lerpTarget;
+    private float distanceBetweenPools;
+    private float distanceBetweenPoolsModifier = Global.LAVA_DEFAULT_DISTANCE_BETWEEN_POOLS_MODIFIER;
+    private float perDistanceBetweenPoolsModifier = Global.LAVA_DEFAULT_DISTANCE_BETWEEN_POOLS_MODIFIER;
     private float distanceIntoMap = Global.LAVA_DEFAULT_DISTANCE_INTO_MAP;
+    private float wallInsetOffset = 0.1f;
+
+    private Vector3 velocity = Vector3.zero;
 
     // Passed in by levelBuilder
     [HideInInspector] public int mapWidth;
@@ -35,29 +39,32 @@ public class Lava : Obstacle
     {
         name = Global.LAVA_NAME;
 
-        //Sets scale for both lava pools
+        // Accounts for outer walls
+        mapWidth -= 2;
+
+        // Sets scale for both lava pools
         lavaL.transform.localScale = new Vector3(scale * mapWidth, scale, scale * mapDepth);
         lavaR.transform.localScale = new Vector3(scale * mapWidth, scale, scale * mapDepth);
 
-        distanceBetweenLavaPools = mapWidth * 2 * scale;
-        perivousDistanceBetweenLavaPools = distanceBetweenLavaPools;
+        distanceBetweenPools = (mapWidth + wallInsetOffset) * 2 * scale;
         currentWaitTime = waitTime;
         approachingSide = ApproachingSide.Left;
 
-        lavaDefault = new Vector3 ((lavaL.transform.position.x - mapWidth) * scale, lavaL.transform.position.y + scale, lavaL.transform.position.z);
+        lavaDefault = new Vector3 ((lavaL.transform.position.x - (mapWidth + wallInsetOffset)) * scale, lavaL.transform.position.y + scale, lavaL.transform.position.z);
 
-        lerpTarget = lavaDefault.x * distanceIntoMap;
+        lerpTarget = new Vector3 (lavaDefault.x * distanceIntoMap, lavaDefault.y, lavaDefault.z);
 
         lavaL.transform.position = lavaDefault;
-        lavaR.transform.position = new Vector3 (lavaDefault.x + distanceBetweenLavaPools, lavaDefault.y, lavaDefault.z);
+        lavaR.transform.position = new Vector3 (lavaDefault.x + distanceBetweenPools, lavaDefault.y, lavaDefault.z);
     }
 
     // Update is called once per frame
     void Update()
     {
         //CHANGE LATER
-        lavaL.transform.position = new Vector3(Mathf.Lerp(lavaL.transform.position.x, lerpTarget, Time.deltaTime * 1), lavaDefault.y, lavaDefault.z);
-        lavaR.transform.position = new Vector3(lavaL.transform.position.x + Mathf.Lerp(perivousDistanceBetweenLavaPools, distanceBetweenLavaPools, Time.deltaTime * 1), lavaDefault.y, lavaDefault.z);
+        //lavaL.transform.position = new Vector3(Mathf.Lerp(lavaL.transform.position.x, lerpTarget, Time.deltaTime * 1), lavaDefault.y, lavaDefault.z);
+        lavaL.transform.position = Vector3.SmoothDamp(lavaL.transform.position, lerpTarget, ref velocity, waitTime/2);
+        lavaR.transform.position = new Vector3(lavaL.transform.position.x + Mathf.Lerp(lavaR.transform.position.x, distanceBetweenPools * distanceBetweenPoolsModifier, Time.deltaTime * 0.1f), lavaDefault.y, lavaDefault.z);
     }
     public override void ObstacleUpdate()
     {
@@ -68,12 +75,12 @@ public class Lava : Obstacle
             if (approachingSide == ApproachingSide.Left)
             {
                 approachingSide = ApproachingSide.Right;
-                lerpTarget = lavaDefault.x;
+                lerpTarget = lavaDefault;
             }
             else
             {
                 approachingSide = ApproachingSide.Left;
-                lerpTarget = lavaDefault.x * distanceIntoMap;
+                lerpTarget = new Vector3 (lavaDefault.x * distanceIntoMap, lavaDefault.y, lavaDefault.z);
             }
         }
         else
@@ -91,15 +98,46 @@ public class Lava : Obstacle
         switch (level)
         {
             case 2:
-                waitTime--;
+                distanceIntoMap = 0.8f;
                 break;
 
             case 3:
+                perDistanceBetweenPoolsModifier = distanceBetweenPools;
+                distanceBetweenPools = 0.85f;
+                break;
+
+            case 4:
+                waitTime--;
+                break;
+
+            case 5:
+                distanceIntoMap = 0.65f;
+                break;
+
+            case 6:
+                perDistanceBetweenPoolsModifier = distanceBetweenPools;
+                distanceBetweenPools = 0.7f;
+                break;
+
+            case 7:
+                waitTime--;
+                break;
+
+            case 8:
+                distanceIntoMap = 0.5f;
+                break;
+
+            case 9:
+                perDistanceBetweenPoolsModifier = distanceBetweenPools;
+                distanceBetweenPools = 0.5f;
+                break;
+
+            case 10:
                 waitTime--;
                 break;
 
             default:
-
+                
                 break;
         }
 

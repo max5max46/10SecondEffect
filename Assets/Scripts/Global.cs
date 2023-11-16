@@ -15,14 +15,18 @@ public class Global : MonoBehaviour
     public const int LAVA_LEVEL_MAX = 1;
 
     // Shooter Settings
+    public const int SHOOTER_DEFAULT_WAIT_TIME = 2;
     public const float SHOOTER_BASE_SHOT_SPEED = 0.5f;
 
     // Spike Settings
+    public const int SPIKES_DEFAULT_WAIT_TIME = 1;
     public const float SPIKES_HALF_OUT_HEIGHT = 0.5f;
     public const float SPIKES_FULL_OUT_HEIGHT = 1.3f;
     public const float SPIKE_LAUNCH_SPEED = 17;
 
     // Lava Settings
+    public const int LAVA_DEFAULT_WAIT_TIME = 6;
     public const float LAVA_MOVE_SPEED = 10f;
-    public const float LAVA_DEFAULT_DISTANCE_INTO_MAP = 0.8f;
+    public const float LAVA_DEFAULT_DISTANCE_INTO_MAP = 0.9f;
+    public const float LAVA_DEFAULT_DISTANCE_BETWEEN_POOLS_MODIFIER = 0.95f;
 }

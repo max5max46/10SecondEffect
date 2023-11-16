@@ -16,7 +16,7 @@ public class Spikes : Obstacle
     }
 
     //Wait time in Seconds
-    private int waitTime = 1;
+    private int waitTime = Global.SPIKES_DEFAULT_WAIT_TIME;
     private int currentWaitTime;
 
     [HideInInspector] public bool altTiming = false;

@@ -21,7 +21,7 @@ public class Shooter : Obstacle
     private float shotSpeed;
 
     //Wait time in Seconds
-    private int waitTime = 2;
+    private int waitTime = Global.SHOOTER_DEFAULT_WAIT_TIME;
     private int currentWaitTime;
 
     private void Start()
