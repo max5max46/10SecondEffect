@@ -19,6 +19,7 @@ public class Shooter : Obstacle
 
     private ShooterState state = ShooterState.Wait;
     private float shotSpeed;
+
     //Wait time in Seconds
     private int waitTime = 2;
     private int currentWaitTime;

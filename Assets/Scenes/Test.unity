@@ -178,7 +178,7 @@ MonoBehaviour:
   wallTileFourSides: {fileID: 2956656406424848103, guid: 13473efd46d4f574cb9ee6e1f1080820, type: 3}
   shooter: {fileID: 8983060805513786434, guid: f6f7ffdc2c6683c419e5665d1e1b4dc0, type: 3}
   spikes: {fileID: 3978101713699437297, guid: 60e5cde5bb90d2d42a1a9f789a1fafd0, type: 3}
-  lava: {fileID: 0}
+  lava: {fileID: 4482063372092186383, guid: d27ba3785b4d46348b8d312c529ec629, type: 3}
 --- !u!114 &108419583
 MonoBehaviour:
   m_ObjectHideFlags: 0

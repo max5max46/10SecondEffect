@@ -21,4 +21,8 @@ public class Global : MonoBehaviour
     public const float SPIKES_HALF_OUT_HEIGHT = 0.5f;
     public const float SPIKES_FULL_OUT_HEIGHT = 1.3f;
     public const float SPIKE_LAUNCH_SPEED = 17;
+
+    // Lava Settings
+    public const float LAVA_MOVE_SPEED = 10f;
+    public const float LAVA_DEFAULT_DISTANCE_INTO_MAP = 0.8f;
 }

@@ -6,6 +6,8 @@ using static Structs;
 using UnityEngine.Tilemaps;
 using UnityEngine.WSA;
 using UnityEditor.Experimental.GraphView;
+using static UnityEditor.Experimental.GraphView.GraphView;
+using UnityEngine.UIElements;
 
 public class LevelBuilder : MonoBehaviour
 {
@@ -31,10 +33,10 @@ public class LevelBuilder : MonoBehaviour
         FileData fileData = TestDataFill();
 
         //Converts to Level Data
-        LevelData levelData = FileDataToLevelData(fileData);
+        LevelData lvlData = FileDataToLevelData(fileData);
 
         //Builds From Level Data
-        BuildLevel(levelData);
+        LevelData levelData = BuildLevel(lvlData);
 
         //Pass Back to Manager
         return levelData;
@@ -108,7 +110,7 @@ public class LevelBuilder : MonoBehaviour
         fileData.shooterMaxLevel = 5;
         fileData.shooterStartingLevel = 1;
 
-        fileData.isLavaOn = false;
+        fileData.isLavaOn = true;
         fileData.lavaMaxLevel = 1;
         fileData.lavaStartingLevel = 1;
 
@@ -364,8 +366,10 @@ public class LevelBuilder : MonoBehaviour
         }
     }
 
-    private void BuildLevel(LevelData levelData)
+    private LevelData BuildLevel(LevelData lvlData)
     {
+        LevelData levelData = lvlData;
+
         int depth = levelData.tileMap.GetLength(1);
         int width = levelData.tileMap.GetLength(2);
 
@@ -382,9 +386,9 @@ public class LevelBuilder : MonoBehaviour
                 {
                     //Unpacking some variables
                     Structs.Tile tile = levelData.tileMap[layer, y, x];
-                    float xPos = (((width / 2) + x) * levelData.scale) + xEvenOffset;
+                    float xPos = ((x - (width / 2)) * levelData.scale) + xEvenOffset;
                     float yPos = tile.height * levelData.scale;
-                    float zPos = (((depth / 2) - y) * levelData.scale) - yEvenOffset;
+                    float zPos = ((y - (depth / 2)) * levelData.scale) - yEvenOffset;
                     Vector3 tilePosition = new Vector3(xPos, yPos, zPos);
 
                     // Checks if the tile attempting to be instantiated has its asset (prefab) defined
@@ -423,10 +427,21 @@ public class LevelBuilder : MonoBehaviour
                     }
                 }
 
-        //Add all game objects not on the tile map
+        // Add all game objects not on the tile map
         if (levelData.isLavaOn)
         {
+            // Makes a instantance of the prefab lava and give it to levelData
+            GameObject lavaGO = Instantiate(lava, Vector3.zero, Quaternion.Euler(Vector3.zero));
+            levelData.lavaGameObject = lavaGO;
 
+            // Lava is given its unique properties and certain levelData values
+            levelData.lavaGameObject.GetComponent<Obstacle>().SetStartingLevel(levelData.lavaStartingLevel);
+            levelData.lavaGameObject.GetComponent<Obstacle>().SetMaxLevel(levelData.lavaMaxLevel);
+            levelData.lavaGameObject.GetComponent<Lava>().scale = levelData.scale;
+            levelData.lavaGameObject.GetComponent<Lava>().mapWidth = width;
+            levelData.lavaGameObject.GetComponent<Lava>().mapDepth = depth;
         }
+
+        return levelData;
     }
 }

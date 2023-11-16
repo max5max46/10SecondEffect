@@ -57,8 +57,11 @@ public class Structs : MonoBehaviour
         public bool isLavaOn;
         public int lavaStartingLevel;
         public int lavaMaxLevel;
-        public GameObject lavaGameObjectL;
-        public GameObject lavaGameObjectR;
+        public GameObject lavaGameObject;
 
+        public LevelData(GameObject lavaGameObject) : this()
+        {
+            this.lavaGameObject = lavaGameObject;
+        }
     }
 }
