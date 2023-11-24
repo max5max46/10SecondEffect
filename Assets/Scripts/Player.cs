@@ -5,30 +5,30 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private GameObject camera;
+    [SerializeField] private GameObject playerCamera;
     [SerializeField] private float acceleration = 2;
     [SerializeField] private float maxSpeed = 1;
     [SerializeField] private float deceleration = 1;
     [SerializeField] private float cameraHeight = 5;
 
-    public bool canMove;
+    [HideInInspector] public bool canMove;
 
-    public Rigidbody rb;
+    [HideInInspector] public Rigidbody rb;
 
     private bool upPressed = false;
     private bool downPressed = false;
     private bool rightPressed = false;
     private bool leftPressed = false;
-    public bool pausePressed = false;
+    [HideInInspector] public bool pausePressed = false;
 
     //anything that hits the player sets this to true, Program Manager then takes this info to handles the lose state
-    public bool isHit = false;
+    [HideInInspector] public bool isHit = false;
 
     // Start is called before the first frame update
     void Start()
     {
         canMove = true;
-        camera.transform.position = new Vector3(transform.position.x, cameraHeight, transform.position.z);
+        playerCamera.transform.position = new Vector3(transform.position.x, cameraHeight, transform.position.z);
         rb = GetComponent<Rigidbody>();
     }
 
@@ -36,7 +36,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         //Update camera to follow player
-        camera.transform.position = new Vector3(transform.position.x, cameraHeight, transform.position.z);
+        playerCamera.transform.position = new Vector3(transform.position.x, cameraHeight, transform.position.z);
 
         if (canMove)
         {

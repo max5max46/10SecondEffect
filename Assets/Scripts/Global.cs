@@ -26,7 +26,5 @@ public class Global : MonoBehaviour
 
     // Lava Settings
     public const int LAVA_DEFAULT_WAIT_TIME = 6;
-    public const float LAVA_MOVE_SPEED = 10f;
     public const float LAVA_DEFAULT_DISTANCE_INTO_MAP = 0.9f;
-    public const float LAVA_DEFAULT_DISTANCE_BETWEEN_POOLS_MODIFIER = 0.95f;
 }

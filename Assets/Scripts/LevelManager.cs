@@ -63,7 +63,6 @@ public class LevelManager : MonoBehaviour
 
         // For non tile map obstacles
         if (levelData.isLavaOn)
-           
             levelData.lavaGameObject.GetComponent<Obstacle>().ObstacleUpdate();
     }
 
@@ -103,7 +102,7 @@ public class LevelManager : MonoBehaviour
                         if (levelData.tileMap[1, y, x].name == obstacleName)
                         {
                             // Calls the Method in Obstacle (Class) to get true or false
-                            if (levelData.tileMap[1, y, x].gameObject.GetComponent<Obstacle>().IsObstacleAtMaxLevel()) { }
+                            if (levelData.tileMap[1, y, x].gameObject.GetComponent<Obstacle>().IsObstacleAtMaxLevel())
                                 obstacleTypesInLevelTemp.Remove(obstacleName);
 
                             // Takes us out of the double for loop once a obstacle of the same type (name) is found because we only need to find 1 to check

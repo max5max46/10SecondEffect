@@ -57,13 +57,13 @@ public class Spikes : Obstacle
 
             case SpikeState.AboutToSpike:
 
-                lerpTarget = spikeDefault.y + Global.SPIKES_HALF_OUT_HEIGHT;
+                lerpTarget = spikeDefault.y + (Global.SPIKES_HALF_OUT_HEIGHT * transform.localScale.y);
                 state = SpikeState.Spike;
                 break;
 
             case SpikeState.Spike:
 
-                lerpTarget = spikeDefault.y + Global.SPIKES_FULL_OUT_HEIGHT;
+                lerpTarget = spikeDefault.y + (Global.SPIKES_FULL_OUT_HEIGHT * transform.localScale.y);
 
                 // If waitTime becomes negative, skip the Wait state
                 if (waitTime >= 0)

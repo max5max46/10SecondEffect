@@ -5,9 +5,11 @@ using UnityEngine;
 
 public class Obstacle : MonoBehaviour
 {
+    #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
     protected string name;
-    protected int levelMax { get; set; }
-    protected int level { get; set; }
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
+    protected int levelMax;
+    protected int level;
 
     public virtual void ObstacleUpdate()
     {

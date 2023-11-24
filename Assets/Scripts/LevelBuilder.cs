@@ -388,7 +388,7 @@ public class LevelBuilder : MonoBehaviour
                     Structs.Tile tile = levelData.tileMap[layer, y, x];
                     float xPos = ((x - (width / 2)) * levelData.scale) + xEvenOffset;
                     float yPos = tile.height * levelData.scale;
-                    float zPos = ((y - (depth / 2)) * levelData.scale) - yEvenOffset;
+                    float zPos = ((-y + (depth / 2)) * levelData.scale) - yEvenOffset;
                     Vector3 tilePosition = new Vector3(xPos, yPos, zPos);
 
                     // Checks if the tile attempting to be instantiated has its asset (prefab) defined
@@ -423,7 +423,7 @@ public class LevelBuilder : MonoBehaviour
                     {
                         // Sets Player spawn at the player spawn tile in the tile map
                         if (tile.name == "PlayerSpawn")
-                            player.transform.position = tilePosition;
+                            player.transform.position = new Vector3(tilePosition.x, (tilePosition.y / 2) + 0.5f, tilePosition.z);
                     }
                 }
 
