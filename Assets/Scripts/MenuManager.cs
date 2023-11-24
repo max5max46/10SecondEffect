@@ -9,20 +9,28 @@ public class MenuManager : MonoBehaviour
     public enum MenuState
     {
         None,
+        Title,
+        Options,
+        LevelSelect,
         Pause,
-        Lose
+        Lose,
+        Win
     }
 
     private MenuState state;
 
+    public GameObject titleScreen;
+    public GameObject optionsMenu;
+    public GameObject levelSelect;
     public GameObject pauseMenu;
     public GameObject loseScreen;
+    public GameObject winScreen;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        ChangeMenu((int)MenuState.None);
+        ChangeMenu((int)MenuState.Title);
     }
 
     // Changes Menu according to the index of the enum MenuState
@@ -30,8 +38,12 @@ public class MenuManager : MonoBehaviour
     {
         this.state = (MenuState)state;
 
+        titleScreen.SetActive(false);
+        optionsMenu.SetActive(false);
+        levelSelect.SetActive(false);
         pauseMenu.SetActive(false);
         loseScreen.SetActive(false);
+        winScreen.SetActive(false);
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -44,12 +56,28 @@ public class MenuManager : MonoBehaviour
                 Cursor.visible = false;
                 break;
 
+            case MenuState.Title:
+                titleScreen.SetActive(true);
+                break;
+
+            case MenuState.Options:
+                optionsMenu.SetActive(true);
+                break;
+
+            case MenuState.LevelSelect:
+                levelSelect.SetActive(true);
+                break;
+
             case MenuState.Pause:
                 pauseMenu.SetActive(true);
                 break;
 
             case MenuState.Lose:
                 loseScreen.SetActive(true);
+                break;
+
+            case MenuState.Win:
+                winScreen.SetActive(true);
                 break;
         }
     }

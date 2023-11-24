@@ -10,46 +10,73 @@ public class LevelManager : MonoBehaviour
 {
     private double globalTimer = 0;
     private int globalTimerCheck = 1;
-    private int upgradeTimer = 10;
+    private int upgradeTimer = Global.TIME_TO_UPGRADE;
     private System.Random RNG = new System.Random();
 
     [SerializeField] private LevelBuilder levelBuilder;
 
+    private UIManager uiManager;
+    private MenuManager menuManager;
+    private SaveFileManager saveFileManager;
+    private LevelSelectManager levelSelectManager;
+    private Player player;
     private LevelData levelData;
 
     private void Start()
     {
-        levelData = levelBuilder.LoadAndBuildLevel();
+        levelSelectManager = FindAnyObjectByType<LevelSelectManager>();
+
+        levelData = levelBuilder.LoadAndBuildLevel(levelSelectManager.idToLoad);
+
+        uiManager = FindAnyObjectByType<UIManager>();
+        menuManager = FindAnyObjectByType<MenuManager>();
+        saveFileManager = FindAnyObjectByType<SaveFileManager>();
+        player = FindAnyObjectByType<Player>();
+
+        uiManager.ResetTimer();
     }
 
     // Update is called once per frame
     void Update()
     {
         globalTimer += Time.deltaTime;
+
+        // Checks if player has been hit by a hazard, switchs to lose state
+        if (player.isHit)
+            PlayerLoses();
+
+        // Checks if a second has passed
         if (globalTimer >= globalTimerCheck) 
         {
             globalTimerCheck++;
             upgradeTimer--;
+
             Debug.Log(upgradeTimer);
+
             ObstacleUpdate();
+            UpdateUI();
+
+            // Checks if 10 seconds has passed
             if (upgradeTimer <= 0)
             {
                 TenSecondEffect();
-                upgradeTimer = 10;
+                upgradeTimer = Global.TIME_TO_UPGRADE;
             }
         }
     }
 
-    // Is called after every "ten" seconds (CHANGE LATER), Upgrades obstucles and changes visual effects (IN PROGRESS)
+    // Is called after every ten seconds, Upgrades obstacles and checks for win state
     private void TenSecondEffect()
     {
 
-        if (levelData.obstacleTypesInLevel.Count != 0)
-            RemoveMaxLevelObstacles();
+        RemoveMaxLevelObstacles();
+
+        // Checks if all Obstacles have hit max level, if true, Win the level
         if (levelData.obstacleTypesInLevel.Count != 0)
             UpgradeRandomObstacle();
+        else
+            PlayerWins();
 
-        UpdateUI();
     }
 
     // Tells all Obstacles to update, this occurs by default every scond
@@ -64,6 +91,12 @@ public class LevelManager : MonoBehaviour
         // For non tile map obstacles
         if (levelData.isLavaOn)
             levelData.lavaGameObject.GetComponent<Obstacle>().ObstacleUpdate();
+    }
+
+    // Updates the UI in uiManager
+    private void UpdateUI()
+    {
+        uiManager.timer++;
     }
 
     // Randomly upgrades a obstacle type
@@ -119,8 +152,21 @@ public class LevelManager : MonoBehaviour
         levelData.obstacleTypesInLevel = obstacleTypesInLevelTemp;
     }
 
-    private void UpdateUI()
+    private void PlayerLoses()
     {
-
+        // Swaps to lose state
+        player.isHit = false;
+        player.rb.velocity = Vector3.zero;
+        ProgramManager.PauseGame();
+        menuManager.ChangeMenu(5);
     }
+
+    private void PlayerWins()
+    {
+        saveFileManager.UnlockLevel(levelData.id + 1);
+        player.rb.velocity = Vector3.zero;
+        ProgramManager.PauseGame();
+        menuManager.ChangeMenu(6);
+    }
+
 }

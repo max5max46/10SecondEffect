@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,9 +24,11 @@ public class Structs : MonoBehaviour
         }
     }
 
+    [Serializable]
     public struct FileData
     {
         public string name;
+        public int id;
         public int[,,] intMap;
         public float scale;
 
@@ -44,6 +47,7 @@ public class Structs : MonoBehaviour
     public struct LevelData
     {
         public string name;
+        public int id;
         public Tile[,,] tileMap;
         public List<string> obstacleTypesInLevel;
         public float scale;

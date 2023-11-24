@@ -14,10 +14,6 @@ public class ProgramManager : MonoBehaviour
         // Checks if player hit the pause button
         if (player.pausePressed)
             PausePressed();
-
-        // Checks if player has been hit by a hazard
-        if (player.isHit)
-            PlayerHit();
     }
 
     private void PausePressed()
@@ -28,17 +24,8 @@ public class ProgramManager : MonoBehaviour
         if (menuManager.CheckState() == 0)
         {
             PauseGame();
-            menuManager.ChangeMenu(1);
+            menuManager.ChangeMenu(4);
         }
-    }
-
-    private void PlayerHit()
-    {
-        // Swaps to lose state
-        player.isHit = false;
-        player.rb.velocity = Vector3.zero;
-        PauseGame();
-        menuManager.ChangeMenu(2);
     }
 
     public static void ResetScene()
@@ -57,5 +44,20 @@ public class ProgramManager : MonoBehaviour
     {
         // Unpauses game (temp)
         Time.timeScale = 1;
+    }
+
+    public static void LoadGameplay()
+    {
+        SceneManager.LoadScene("Gameplay");
+    }
+
+    public static void LoadMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public static void ExitApplication()
+    {
+        Application.Quit();
     }
 }

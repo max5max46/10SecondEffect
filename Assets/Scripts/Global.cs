@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Global : MonoBehaviour
 {
+    // Level Manager Settings
+    public const int TIME_TO_UPGRADE = 10;
+
     // Obstacle Names
     public const string SPIKES_NAME = "Spikes";
     public const string SHOOTER_NAME = "Shooter";

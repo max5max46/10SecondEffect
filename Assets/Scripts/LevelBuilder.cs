@@ -8,6 +8,9 @@ using UnityEngine.WSA;
 using UnityEditor.Experimental.GraphView;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using UnityEngine.UIElements;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System;
 
 public class LevelBuilder : MonoBehaviour
 {
@@ -25,12 +28,12 @@ public class LevelBuilder : MonoBehaviour
     private GameObject player;
 
 
-    public LevelData LoadAndBuildLevel()
+    public LevelData LoadAndBuildLevel(int id)
     {
         player = GameObject.FindWithTag("Player");
 
         //Loads File Data
-        FileData fileData = TestDataFill();
+        FileData fileData = LoadFileData(id);
 
         //Converts to Level Data
         LevelData lvlData = FileDataToLevelData(fileData);
@@ -42,80 +45,24 @@ public class LevelBuilder : MonoBehaviour
         return levelData;
     }
 
-    public FileData TestDataFill()
+    public FileData LoadFileData(int id)
     {
-        FileData fileData = new FileData();
 
-        fileData.name = "Test Level";
-
-        //[ TEST ]
-        /* 
-        [Level Layer]
-        floor tile = 0
-        wall tile = 1
-
-        [Obstacle Layer]
-        nothing = 0
-        spikes = 1
-        shooter = 2
-        player spawn = 3
-
-        [Properties]
-        default = 0
-        shooter facing direction = 0,1,2,3 (North, East, South, West)
-        spikes = 0,1 (Normal Timing, Alt Timing)
-        */
-        fileData.intMap = new int[,,]
+        if (File.Exists(UnityEngine.Application.persistentDataPath + "/Level" + id + ".dat"))
         {
-        {
-                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1},
-                {1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1},
-                {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-                {1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1},
-                {1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
-                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(UnityEngine.Application.persistentDataPath + "/Level" + id + ".dat", FileMode.Open);
+            FileData fileData = (FileData)bf.Deserialize(file);
+            file.Close();
 
-        },
-        {
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 3, 0, 1, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        },
-        {
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            return fileData;
         }
-        };
-        fileData.scale = 1;
+        else
+        {
+            Debug.LogError("No File Data Found");
+        }
 
-        fileData.spikesMaxLevel = 3;
-        fileData.spikesStartingLevel = 1;
-
-        fileData.shooterMaxLevel = 5;
-        fileData.shooterStartingLevel = 1;
-
-        fileData.isLavaOn = true;
-        fileData.lavaMaxLevel = 10;
-        fileData.lavaStartingLevel = 1;
-
-
-        return fileData;
+        return new FileData();
     }
 
     private LevelData FileDataToLevelData(FileData fileData)
@@ -124,6 +71,7 @@ public class LevelBuilder : MonoBehaviour
 
         // Fills in levelData using fileData
         levelData.name = fileData.name;
+        levelData.id = fileData.id;
         levelData.tileMap = IntMapToTileMap(fileData.intMap);
         levelData.scale = fileData.scale;
         levelData.spikesMaxLevel = fileData.spikesMaxLevel;
