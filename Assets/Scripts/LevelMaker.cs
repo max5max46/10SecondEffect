@@ -10,7 +10,7 @@ public class LevelMaker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        int deleteIdAt = -1;
+        int deleteIdAt = 0;
 
         FileData fileData = LevelMakerDev();
 
@@ -22,7 +22,7 @@ public class LevelMaker : MonoBehaviour
     {
         FileData fileData = new FileData();
 
-        fileData.name = "Test Level";
+        fileData.name = "level 1";
         fileData.id = 0;
 
         //[ TEST ]
@@ -46,34 +46,34 @@ public class LevelMaker : MonoBehaviour
         {
         {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1},
-                {1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1},
-                {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
                 {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-                {1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1},
-                {1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
+                {1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                {1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 
         },
         {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 3, 0, 1, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0},
+                { 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0},
+                { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+                { 0, 1, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0},
+                { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+                { 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         },
         {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                { 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0},
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+                { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -81,14 +81,14 @@ public class LevelMaker : MonoBehaviour
         };
         fileData.scale = 1;
 
-        fileData.spikesMaxLevel = 2;
+        fileData.spikesMaxLevel = 3;
         fileData.spikesStartingLevel = 1;
 
-        fileData.shooterMaxLevel = 1;
+        fileData.shooterMaxLevel = 5;
         fileData.shooterStartingLevel = 1;
 
         fileData.isLavaOn = true;
-        fileData.lavaMaxLevel = 1;
+        fileData.lavaMaxLevel = 10;
         fileData.lavaStartingLevel = 1;
 
 

@@ -8,7 +8,7 @@ public class MenuManager : MonoBehaviour
 {
     public enum MenuState
     {
-        None,
+        Gameplay,
         Title,
         Options,
         LevelSelect,
@@ -19,6 +19,7 @@ public class MenuManager : MonoBehaviour
 
     private MenuState state;
 
+    public GameObject gameplayUI;
     public GameObject titleScreen;
     public GameObject optionsMenu;
     public GameObject levelSelect;
@@ -38,6 +39,7 @@ public class MenuManager : MonoBehaviour
     {
         this.state = (MenuState)state;
 
+        gameplayUI.SetActive(false);
         titleScreen.SetActive(false);
         optionsMenu.SetActive(false);
         levelSelect.SetActive(false);
@@ -51,9 +53,10 @@ public class MenuManager : MonoBehaviour
 
         switch (this.state)
         {
-            case MenuState.None:
+            case MenuState.Gameplay:
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
+                gameplayUI.SetActive(true);
                 break;
 
             case MenuState.Title:
